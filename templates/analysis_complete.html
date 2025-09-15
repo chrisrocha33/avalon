@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Analysis Complete</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body class="analysis-complete">
+    <div class="container">
+        {% if success %}
+            <div class="status-icon">✅</div>
+            <div class="message">{{ message }}</div>
+        {% else %}
+            <div class="status-icon">❌</div>
+            <div class="message">{{ message }}</div>
+        {% endif %}
+        
+        <div class="timestamp">Completed on {{ date }}</div>
+        
+        <div>
+            <a href="/" class="button">🏠 Back to Dashboard</a>
+            <a href="/sectors" class="button">📈 View Results</a>
+        </div>
+    </div>
+</body>
+</html>

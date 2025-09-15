@@ -1,0 +1,240 @@
+{
+  "Sectors": [
+    {"symbol": "XLY", "name": "Consumer Discretionary Select Sector SPDR"},
+    {"symbol": "XLP", "name": "Consumer Staples Select Sector SPDR"},
+    {"symbol": "XLE", "name": "Energy Select Sector SPDR"},
+    {"symbol": "XLF", "name": "Financial Select Sector SPDR"},
+    {"symbol": "XLV", "name": "Health Care Select Sector SPDR"},
+    {"symbol": "XLI", "name": "Industrial Select Sector SPDR"},
+    {"symbol": "XLB", "name": "Materials Select Sector SPDR"},
+    {"symbol": "XLRE", "name": "Real Estate Select Sector SPDR"},
+    {"symbol": "XLK", "name": "Technology Select Sector SPDR"},
+    {"symbol": "XLC", "name": "Communication Services Select Sector SPDR"},
+    {"symbol": "XLU", "name": "Utilities Select Sector SPDR"},
+    {"symbol": "SPY", "name": "SPDR S&P 500 ETF Trust"}
+  ],
+  "Futures": {
+    "Equity Indices": [
+      {"symbol": "ES=F", "name": "E-mini S&P 500 Futures"},
+      {"symbol": "YM=F", "name": "E-mini Dow Futures"},
+      {"symbol": "NQ=F", "name": "E-mini Nasdaq 100 Futures"},
+      {"symbol": "RTY=F", "name": "E-mini Russell 2000 Futures"}
+    ],
+    "Rates (Treasuries)": [
+      {"symbol": "ZB=F", "name": "U.S. Treasury Bond Futures"},
+      {"symbol": "ZN=F", "name": "10-Year T-Note Futures"},
+      {"symbol": "ZF=F", "name": "5-Year T-Note Futures"},
+      {"symbol": "ZT=F", "name": "2-Year T-Note Futures"},
+      {"symbol": "2YY=F", "name": "2-Year Yield Futures"}
+    ],
+    "Metals": [
+      {"symbol": "GC=F", "name": "Gold Futures"},
+      {"symbol": "MGC=F", "name": "Micro Gold Futures"},
+      {"symbol": "SI=F", "name": "Silver Futures"},
+      {"symbol": "SIL=F", "name": "Silver Miners Futures"},
+      {"symbol": "PL=F", "name": "Platinum Futures"},
+      {"symbol": "HG=F", "name": "Copper Futures"},
+      {"symbol": "PA=F", "name": "Palladium Futures"}
+    ],
+    "Energy": [
+      {"symbol": "CL=F", "name": "Crude Oil WTI Futures"},
+      {"symbol": "HO=F", "name": "Heating Oil Futures"},
+      {"symbol": "NG=F", "name": "Natural Gas Futures"},
+      {"symbol": "RB=F", "name": "RBOB Gasoline Futures"},
+      {"symbol": "BZ=F", "name": "Brent Crude Futures"}
+    ],
+    "Grains & Oilseeds": [
+      {"symbol": "ZC=F", "name": "Corn Futures"},
+      {"symbol": "ZO=F", "name": "Oats Futures"},
+      {"symbol": "KE=F", "name": "Kansas Wheat Futures"},
+      {"symbol": "ZR=F", "name": "Rough Rice Futures"},
+      {"symbol": "ZM=F", "name": "Soybean Meal Futures"},
+      {"symbol": "ZL=F", "name": "Soybean Oil Futures"},
+      {"symbol": "ZS=F", "name": "Soybean Futures"}
+    ],
+    "Softs": [
+      {"symbol": "CC=F", "name": "Cocoa Futures"},
+      {"symbol": "KC=F", "name": "Coffee Futures"},
+      {"symbol": "CT=F", "name": "Cotton Futures"},
+      {"symbol": "LBS=F", "name": "Lumber Futures"},
+      {"symbol": "OJ=F", "name": "Orange Juice Futures"},
+      {"symbol": "SB=F", "name": "Sugar Futures"}
+    ],
+    "Livestock": [
+      {"symbol": "GF=F", "name": "Feeder Cattle Futures"},
+      {"symbol": "HE=F", "name": "Lean Hogs Futures"},
+      {"symbol": "LE=F", "name": "Live Cattle Futures"}
+    ]
+  },
+  "Crypto": [
+    {"symbol": "BTC-USD", "name": "Bitcoin"},
+    {"symbol": "ETH-USD", "name": "Ethereum"},
+    {"symbol": "XRP-USD", "name": "XRP"},
+    {"symbol": "USDT-USD", "name": "Tether"},
+    {"symbol": "BNB-USD", "name": "Binance Coin"},
+    {"symbol": "SOL-USD", "name": "Solana"},
+    {"symbol": "USDC-USD", "name": "USD Coin"},
+    {"symbol": "STETH-USD", "name": "Staked Ether"},
+    {"symbol": "DOGE-USD", "name": "Dogecoin"},
+    {"symbol": "TRX-USD", "name": "TRON"},
+    {"symbol": "WTRX-USD", "name": "Wrapped TRON"},
+    {"symbol": "ADA-USD", "name": "Cardano"},
+    {"symbol": "WSTETH-USD", "name": "Wrapped Staked Ether"},
+    {"symbol": "WBTC-USD", "name": "Wrapped Bitcoin"},
+    {"symbol": "LINK-USD", "name": "Chainlink"},
+    {"symbol": "HYPE32196-USD", "name": "Hype Token"},
+    {"symbol": "WETH-USD", "name": "Wrapped Ether"},
+    {"symbol": "XLM-USD", "name": "Stellar"},
+    {"symbol": "SUI20947-USD", "name": "Sui"},
+    {"symbol": "WBETH-USD", "name": "Wrapped Beacon ETH"},
+    {"symbol": "WEETH-USD", "name": "Wrapped Ethereum"},
+    {"symbol": "BCH-USD", "name": "Bitcoin Cash"},
+    {"symbol": "HBAR-USD", "name": "Hedera"},
+    {"symbol": "AVAX-USD", "name": "Avalanche"},
+    {"symbol": "USDE29470-USD", "name": "USDe Stablecoin"}
+  ],
+  "Global Markets": {
+    "North America": {
+      "United States": [
+        {"symbol": "^GSPC", "name": "S&P 500"},
+        {"symbol": "^DJI", "name": "Dow Jones Industrial Average"},
+        { "symbol": "^IXIC", "name": "NASDAQ Composite"},
+        {"symbol": "^NYA", "name": "NYSE Composite"},
+        {"symbol": "^XAX", "name": "NYSE AMEX Composite"},
+        {"symbol": "^RUT", "name": "Russell 2000"},
+        {"symbol": "^VIX", "name": "CBOE Volatility Index"},
+        {"symbol": "^IRX", "name": "13 Week T-Bill Yield"},
+        {"symbol": "^FVX", "name": "5-Year Treasury Yield"},
+        {"symbol": "^TNX", "name": "10-Year Treasury Yield"},
+        {"symbol": "^TYX", "name": "30-Year Treasury Yield"}
+      ],
+      "Canada": [
+        {"symbol": "^GSPTSE", "name": "S&P/TSX Composite"},
+        {"symbol": "EURCAD=X", "name": "EUR/CAD"}
+      ],
+      "Mexico": [
+        {"symbol": "^MXX", "name": "IPC Mexico"},
+        {"symbol": "MXN=X", "name": "USD/MXN"}
+      ]
+    },
+    "South America": {
+      "Brazil": [
+        {"symbol": "^BVSP", "name": "Bovespa Index"}
+      ],
+      "Argentina": [
+        {"symbol": "^MERV", "name": "MERVAL Index"}
+      ],
+      "Chile": [
+        {"symbol": "^IPSA", "name": "IPSA Index"}
+      ]
+    },
+    "Europe": {
+      "Eurozone": [
+        {"symbol": "^STOXX50E", "name": "Euro Stoxx 50"},
+        {"symbol": "^N100", "name": "Euronext 100"},
+        {"symbol": "^XDE", "name": "Euro STOXX 50 (EUR Unhedged)"},
+        {"symbol": "EURUSD=X", "name": "EUR/USD"}
+      ],
+      "United Kingdom": [
+        {"symbol": "^FTSE", "name": "FTSE 100"},
+        {"symbol": "^BUK100P", "name": "FTSE UK 100"},
+        {"symbol": "GBPUSD=X", "name": "GBP/USD"}
+      ],
+      "Germany": [
+        {"symbol": "^GDAXI", "name": "DAX"}
+      ],
+      "France": [
+        {"symbol": "^FCHI", "name": "CAC 40"}
+      ],
+      "Belgium": [
+        {"symbol": "^BFX", "name": "BEL 20"}
+      ],
+      "Switzerland": [
+        {"symbol": "EURCHF=X", "name": "EUR/CHF"}
+      ],
+      "Sweden": [
+        {"symbol": "EURSEK=X", "name": "EUR/SEK"}
+      ],
+      "Hungary": [
+        {"symbol": "EURHUF=X", "name": "EUR/HUF"}
+      ],
+      "Russia": [
+        {"symbol": "MOEX.ME", "name": "MOEX Russia Index"},
+        {"symbol": "RUB=X", "name": "USD/RUB"}
+      ]
+    },
+    "Asia": {
+      "China": [
+        {"symbol": "000001.SS", "name": "Shanghai Composite"},
+        {"symbol": "CNY=X", "name": "USD/CNY"}
+      ],
+      "Japan": [
+        {"symbol": "^N225", "name": "Nikkei 225"},
+        {"symbol": "JPY=X", "name": "USD/JPY"},
+        {"symbol": "EURJPY=X", "name": "EUR/JPY"}
+      ],
+      "Hong Kong": [
+        {"symbol": "^HSI", "name": "Hang Seng Index"},
+        {"symbol": "HKD=X", "name": "USD/HKD"}
+      ],
+      "Singapore": [
+        {"symbol": "^STI", "name": "Straits Times Index"},
+        {"symbol": "SGD=X", "name": "USD/SGD"}
+      ],
+      "India": [
+        {"symbol": "^BSESN", "name": "BSE Sensex"},
+        {"symbol": "INR=X", "name": "USD/INR"}
+      ],
+      "Indonesia": [
+        {"symbol": "^JKSE", "name": "Jakarta Composite"},
+        {"symbol": "IDR=X", "name": "USD/IDR"}
+      ],
+      "Malaysia": [
+        {"symbol": "^KLSE", "name": "FTSE Bursa Malaysia KLCI"},
+        {"symbol": "MYR=X", "name": "USD/MYR"}
+      ],
+      "South Korea": [
+        {"symbol": "^KS11", "name": "KOSPI"},
+        {"symbol": "KRW=X", "name": "USD/KRW"}
+      ],
+      "Taiwan": [
+        {"symbol": "^TWII", "name": "Taiwan Weighted Index"}
+      ],
+      "Philippines": [
+        {"symbol": "PHP=X", "name": "USD/PHP"}
+      ],
+      "Thailand": [
+        {"symbol": "THB=X", "name": "USD/THB"}
+      ]
+    },
+    "Oceania": {
+      "Australia": [
+        {"symbol": "^AXJO", "name": "S&P/ASX 200"},
+        {"symbol": "^AORD", "name": "All Ordinaries"},
+        {"symbol": "AUDUSD=X", "name": "AUD/USD"}
+      ],
+      "New Zealand": [
+        {"symbol": "^NZ50", "name": "NZX 50"},
+        {"symbol": "NZDUSD=X", "name": "NZD/USD"}
+      ]
+    },
+    "Middle East": {
+      "Israel": [
+        {"symbol": "^TA125.TA", "name": "TA-125"}
+      ]
+    },
+    "Africa": {
+      "South Africa": [
+        {"symbol": "^JN0U.JO", "name": "Top 40"},
+        {"symbol": "ZAR=X", "name": "USD/ZAR"}
+      ] 
+    },
+    "Global / FX & Other": {
+      "Global": [
+        {"symbol": "DX-Y.NYB", "name": "U.S. Dollar Index"},
+        {"symbol": "^125904-USD-STRD", "name": "Structured USD Index"},
+        {"symbol": "GBPJPY=X", "name": "GBP/JPY"}
+      ]
+    }
+  }
+} 

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block title %}Sectors Analysis{% endblock %}
+{% block content %}
+  <div class="page-intro">
+    <h1>Sectors Analysis</h1>
+    <div class="small">Generated {{ date }}</div>
+  </div>
+
+  <!-- Descriptive statistics / Data snapshot -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Dataset Snapshot</h2>
+    </div>
+    <div class="small">
+      Start: {{ data_start_date if data_start_date else 'N/A' }} | End: {{ data_end_date if data_end_date else 'N/A' }}
+    </div>
+    <h3>Descriptive Statistics</h3>
+    {% if desc_stats_html %}
+      {{ desc_stats_html | safe }}
+    {% else %}
+      <p class="small">Descriptive statistics not available</p>
+    {% endif %}
+  </div>
+
+  <!-- Correlation heatmap -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Correlation Heatmap</h2>
+    </div>
+    <div class="imgwrap center">
+      {% if correlation_heatmap %}
+        <img src="data:image/png;base64,{{ correlation_heatmap }}" alt="Correlation Heatmap">
+      {% else %}
+        <p class="small">Correlation heatmap not available</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Sector grid (11 x 9) -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Sector Grid (11 × 9)</h2>
+    </div>
+    {% if sector_grid_pages and sector_grid_pages|length > 0 %}
+      {% for page_b64 in sector_grid_pages %}
+        <div class="imgwrap center">
+          <img src="data:image/png;base64,{{ page_b64 }}" alt="Sector Grid Page {{ loop.index }}">
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="small">Sector grid not available</p>
+    {% endif %}
+  </div>
+
+  <!-- OLS regression model & summaries -->
+  <div class="section">
+    <div class="section-header">
+      <h2>OLS Regression Models</h2>
+    </div>
+    {% if ols_results %}
+      {% for dep, html_summary in ols_results|dictsort %}
+        <h3>{{ dep }}</h3>
+        <div class="card">
+          {{ html_summary | safe }}
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="small">No OLS regression summaries available</p>
+    {% endif %}
+  </div>
+{% endblock %}

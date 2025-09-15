@@ -1,0 +1,818 @@
+
+================================================================================
+DATA COLLECTION RUN: 2025-09-04 02:28:31
+================================================================================
+
+Category: us_Labor_Wages
+  Frequency: W
+  Shape: 9 columns × 1009 rows
+  Date Range: 2006-03-05 to 2025-06-29
+  Columns: CES0500000003, CE16OV, CIVPART, CLF16OV, ICSA, JTSJOL, PAYEMS, UNRATE, AWHAETP
+
+Category: us_Yields_Rates
+  Frequency: D
+  Shape: 13 columns × 25997 rows
+  Date Range: 1954-07-01 to 2025-09-02
+  Columns: DFF, DGS1, DGS2, DGS3, DGS5, DGS7, DGS10, DGS20, DGS30, DTB3, DTB4WK, DCPF3M, RHORUSQ156N
+
+Category: us_Credit_Spreads
+  Frequency: D
+  Shape: 9 columns × 7578 rows
+  Date Range: 1996-12-31 to 2025-09-02
+  Columns: BAMLH0A0HYM2EY, BAMLHYH0A0HYM2TRIV, BAMLC0A0CMEY, BAMLC1A0C13YEY, BAMLC2A0C35YEY, BAMLC3A0C57YEY, BAMLC4A0C710YEY, BAMLC7A0C1015YEY, BAMLC8A0C15PYEY
+
+Category: us_Production_Output
+  Frequency: M
+  Shape: 9 columns × 1279 rows
+  Date Range: 1919-01-01 to 2025-07-01
+  Columns: INDPRO, MNFCTRIMSA, MNFCTRIRSA, PETROLEUMD11, BUSINV, TTLCONS, IEABC, PATENTUSALLTOTAL, ATLSBUSRGEP
+
+Category: us_Consumption_Spending
+  Frequency: M
+  Shape: 7 columns × 799 rows
+  Date Range: 1959-01-01 to 2025-07-01
+  Columns: DSPIC96, RETAILIMSA, RSCCAS, RSXFS, TOTALSA, TOTALSL, PSAVERT
+
+Category: us_Housing_RealEstate
+  Frequency: W
+  Shape: 5 columns × 2631 rows
+  Date Range: 1975-01-05 to 2025-06-01
+  Columns: CSUSHPINSA, EXHOSLUSM495S, FRGSHPUSM649NCIS, HOSMEDUSM052N, WSHOMCB
+
+Category: us_Trade_External
+  Frequency: M
+  Shape: 1 columns × 402 rows
+  Date Range: 1992-01-01 to 2025-06-01
+  Columns: BOPGSTB
+
+Category: us_Monetary_Aggregates
+  Frequency: W
+  Shape: 5 columns × 2101 rows
+  Date Range: 1980-11-03 to 2021-02-01
+  Columns: M2, M2V, TOTBUSSMSA, TMBACBW027SBOG, RESPPANWW
+
+Category: us_Prices_Inflation
+  Frequency: M
+  Shape: 2 columns × 943 rows
+  Date Range: 1947-01-01 to 2025-07-01
+  Columns: CPIAUCSL, PPIACO
+
+Category: us_GDP_NationalAccounts
+  Frequency: Q
+  Shape: 4 columns × 318 rows
+  Date Range: 1946-01-01 to 2025-04-01
+  Columns: GDP, GDPC1, GDI, A261RX1Q020SBEA
+
+Category: us_Banking_Debt_Stability
+  Frequency: M
+  Shape: 6 columns × 711 rows
+  Date Range: 1966-01-31 to 2025-03-31
+  Columns: GFDEBTN, H8B1058NCBCMG, QBPBSTAS, QBPBSTASSCUSTRSC, QBPQYNTIY, QBPQYNUMINST
+
+Category: us_Consumer_Debt
+  Frequency: W
+  Shape: 5 columns × 470 rows
+  Date Range: 2016-07-03 to 2025-06-29
+  Columns: ACTLISCOUUS, DRALACBS, DRCCLACBS, DTCDISA066MSFRBNY, TOTBORR
+
+================================================================================
+DATA COLLECTION RUN: 2025-09-04 13:07:51
+================================================================================
+
+Category: us_Labor_Wages
+  Frequency: W
+  Shape: 9 columns × 1009 rows
+  Date Range: 2006-03-05 to 2025-06-29
+  Columns: CES0500000003, CE16OV, CIVPART, CLF16OV, ICSA, JTSJOL, PAYEMS, UNRATE, AWHAETP
+
+Category: us_Yields_Rates
+  Frequency: D
+  Shape: 13 columns × 25997 rows
+  Date Range: 1954-07-01 to 2025-09-02
+  Columns: DFF, DGS1, DGS2, DGS3, DGS5, DGS7, DGS10, DGS20, DGS30, DTB3, DTB4WK, DCPF3M, RHORUSQ156N
+
+Category: us_Credit_Spreads
+  Frequency: D
+  Shape: 9 columns × 7579 rows
+  Date Range: 1996-12-31 to 2025-09-03
+  Columns: BAMLH0A0HYM2EY, BAMLHYH0A0HYM2TRIV, BAMLC0A0CMEY, BAMLC1A0C13YEY, BAMLC2A0C35YEY, BAMLC3A0C57YEY, BAMLC4A0C710YEY, BAMLC7A0C1015YEY, BAMLC8A0C15PYEY
+
+Category: us_Production_Output
+  Frequency: M
+  Shape: 9 columns × 1279 rows
+  Date Range: 1919-01-01 to 2025-07-01
+  Columns: INDPRO, MNFCTRIMSA, MNFCTRIRSA, PETROLEUMD11, BUSINV, TTLCONS, IEABC, PATENTUSALLTOTAL, ATLSBUSRGEP
+
+Category: us_Consumption_Spending
+  Frequency: M
+  Shape: 7 columns × 799 rows
+  Date Range: 1959-01-01 to 2025-07-01
+  Columns: DSPIC96, RETAILIMSA, RSCCAS, RSXFS, TOTALSA, TOTALSL, PSAVERT
+
+Category: us_Housing_RealEstate
+  Frequency: W
+  Shape: 5 columns × 2631 rows
+  Date Range: 1975-01-05 to 2025-06-01
+  Columns: CSUSHPINSA, EXHOSLUSM495S, FRGSHPUSM649NCIS, HOSMEDUSM052N, WSHOMCB
+
+Category: us_Trade_External
+  Frequency: M
+  Shape: 1 columns × 403 rows
+  Date Range: 1992-01-01 to 2025-07-01
+  Columns: BOPGSTB
+
+Category: us_Monetary_Aggregates
+  Frequency: W
+  Shape: 5 columns × 2101 rows
+  Date Range: 1980-11-03 to 2021-02-01
+  Columns: M2, M2V, TOTBUSSMSA, TMBACBW027SBOG, RESPPANWW
+
+Category: us_Prices_Inflation
+  Frequency: M
+  Shape: 2 columns × 943 rows
+  Date Range: 1947-01-01 to 2025-07-01
+  Columns: CPIAUCSL, PPIACO
+
+Category: us_GDP_NationalAccounts
+  Frequency: Q
+  Shape: 4 columns × 318 rows
+  Date Range: 1946-01-01 to 2025-04-01
+  Columns: GDP, GDPC1, GDI, A261RX1Q020SBEA
+
+Category: us_Banking_Debt_Stability
+  Frequency: M
+  Shape: 6 columns × 711 rows
+  Date Range: 1966-01-31 to 2025-03-31
+  Columns: GFDEBTN, H8B1058NCBCMG, QBPBSTAS, QBPBSTASSCUSTRSC, QBPQYNTIY, QBPQYNUMINST
+
+Category: us_Consumer_Debt
+  Frequency: W
+  Shape: 5 columns × 470 rows
+  Date Range: 2016-07-03 to 2025-06-29
+  Columns: ACTLISCOUUS, DRALACBS, DRCCLACBS, DTCDISA066MSFRBNY, TOTBORR
+
+================================================================================
+DATA COLLECTION RUN: 2025-09-05 11:06:22
+================================================================================
+
+Category: us_Labor_Wages
+  Frequency: W
+  Shape: 9 columns × 1013 rows
+  Date Range: 2006-03-05 to 2025-07-27
+  Columns: CES0500000003, CE16OV, CIVPART, CLF16OV, ICSA, JTSJOL, PAYEMS, UNRATE, AWHAETP
+
+Category: us_Yields_Rates
+  Frequency: D
+  Shape: 13 columns × 25998 rows
+  Date Range: 1954-07-01 to 2025-09-03
+  Columns: DFF, DGS1, DGS2, DGS3, DGS5, DGS7, DGS10, DGS20, DGS30, DTB3, DTB4WK, DCPF3M, RHORUSQ156N
+
+Category: us_Credit_Spreads
+  Frequency: D
+  Shape: 9 columns × 7580 rows
+  Date Range: 1996-12-31 to 2025-09-04
+  Columns: BAMLH0A0HYM2EY, BAMLHYH0A0HYM2TRIV, BAMLC0A0CMEY, BAMLC1A0C13YEY, BAMLC2A0C35YEY, BAMLC3A0C57YEY, BAMLC4A0C710YEY, BAMLC7A0C1015YEY, BAMLC8A0C15PYEY
+
+Category: us_Production_Output
+  Frequency: M
+  Shape: 3 columns × 1279 rows
+  Date Range: 1919-01-01 to 2025-07-01
+  Columns: INDPRO, MNFCTRIMSA, ATLSBUSRGEP
+
+Category: us_Consumption_Spending
+  Frequency: M
+  Shape: 7 columns × 799 rows
+  Date Range: 1959-01-01 to 2025-07-01
+  Columns: DSPIC96, RETAILIMSA, RSCCAS, RSXFS, TOTALSA, TOTALSL, PSAVERT
+
+Category: us_Housing_RealEstate
+  Frequency: W
+  Shape: 5 columns × 2631 rows
+  Date Range: 1975-01-05 to 2025-06-01
+  Columns: CSUSHPINSA, EXHOSLUSM495S, FRGSHPUSM649NCIS, HOSMEDUSM052N, WSHOMCB
+
+Category: us_Trade_External
+  Frequency: M
+  Shape: 1 columns × 403 rows
+  Date Range: 1992-01-01 to 2025-07-01
+  Columns: BOPGSTB
+
+Category: us_Monetary_Aggregates
+  Frequency: W
+  Shape: 5 columns × 2101 rows
+  Date Range: 1980-11-03 to 2021-02-01
+  Columns: M2, M2V, TOTBUSSMSA, TMBACBW027SBOG, RESPPANWW
+
+Category: us_Prices_Inflation
+  Frequency: M
+  Shape: 2 columns × 943 rows
+  Date Range: 1947-01-01 to 2025-07-01
+  Columns: CPIAUCSL, PPIACO
+
+Category: us_GDP_NationalAccounts
+  Frequency: Q
+  Shape: 4 columns × 318 rows
+  Date Range: 1946-01-01 to 2025-04-01
+  Columns: GDP, GDPC1, GDI, A261RX1Q020SBEA
+
+Category: us_Banking_Debt_Stability
+  Frequency: M
+  Shape: 6 columns × 711 rows
+  Date Range: 1966-01-31 to 2025-03-31
+  Columns: GFDEBTN, H8B1058NCBCMG, QBPBSTAS, QBPBSTASSCUSTRSC, QBPQYNTIY, QBPQYNUMINST
+
+Category: us_Consumer_Debt
+  Frequency: W
+  Shape: 5 columns × 470 rows
+  Date Range: 2016-07-03 to 2025-06-29
+  Columns: ACTLISCOUUS, DRALACBS, DRCCLACBS, DTCDISA066MSFRBNY, TOTBORR
+
+================================================================================
+DATA COLLECTION RUN: 2025-09-05 11:06:27
+================================================================================
+
+Category: us_Labor_Wages
+  Frequency: W
+  Shape: 9 columns × 1013 rows
+  Date Range: 2006-03-05 to 2025-07-27
+  Columns: CES0500000003, CE16OV, CIVPART, CLF16OV, ICSA, JTSJOL, PAYEMS, UNRATE, AWHAETP
+
+Category: us_Yields_Rates
+  Frequency: D
+  Shape: 13 columns × 25998 rows
+  Date Range: 1954-07-01 to 2025-09-03
+  Columns: DFF, DGS1, DGS2, DGS3, DGS5, DGS7, DGS10, DGS20, DGS30, DTB3, DTB4WK, DCPF3M, RHORUSQ156N
+
+Category: us_Credit_Spreads
+  Frequency: D
+  Shape: 9 columns × 7580 rows
+  Date Range: 1996-12-31 to 2025-09-04
+  Columns: BAMLH0A0HYM2EY, BAMLHYH0A0HYM2TRIV, BAMLC0A0CMEY, BAMLC1A0C13YEY, BAMLC2A0C35YEY, BAMLC3A0C57YEY, BAMLC4A0C710YEY, BAMLC7A0C1015YEY, BAMLC8A0C15PYEY
+
+Category: us_Production_Output
+  Frequency: M
+  Shape: 3 columns × 312 rows
+  Date Range: 1999-01-31 to 2024-12-31
+  Columns: IEABC, PATENTUSALLTOTAL, ATLSBUSRGEP
+
+Category: us_Consumption_Spending
+  Frequency: M
+  Shape: 7 columns × 799 rows
+  Date Range: 1959-01-01 to 2025-07-01
+  Columns: DSPIC96, RETAILIMSA, RSCCAS, RSXFS, TOTALSA, TOTALSL, PSAVERT
+
+Category: us_Housing_RealEstate
+  Frequency: W
+  Shape: 5 columns × 2631 rows
+  Date Range: 1975-01-05 to 2025-06-01
+  Columns: CSUSHPINSA, EXHOSLUSM495S, FRGSHPUSM649NCIS, HOSMEDUSM052N, WSHOMCB
+
+Category: us_Trade_External
+  Frequency: M
+  Shape: 1 columns × 403 rows
+  Date Range: 1992-01-01 to 2025-07-01
+  Columns: BOPGSTB
+
+Category: us_Monetary_Aggregates
+  Frequency: W
+  Shape: 5 columns × 2101 rows
+  Date Range: 1980-11-03 to 2021-02-01
+  Columns: M2, M2V, TOTBUSSMSA, TMBACBW027SBOG, RESPPANWW
+
+Category: us_Prices_Inflation
+  Frequency: M
+  Shape: 2 columns × 943 rows
+  Date Range: 1947-01-01 to 2025-07-01
+  Columns: CPIAUCSL, PPIACO
+
+Category: us_GDP_NationalAccounts
+  Frequency: Q
+  Shape: 4 columns × 318 rows
+  Date Range: 1946-01-01 to 2025-04-01
+  Columns: GDP, GDPC1, GDI, A261RX1Q020SBEA
+
+Category: us_Banking_Debt_Stability
+  Frequency: M
+  Shape: 6 columns × 711 rows
+  Date Range: 1966-01-31 to 2025-03-31
+  Columns: GFDEBTN, H8B1058NCBCMG, QBPBSTAS, QBPBSTASSCUSTRSC, QBPQYNTIY, QBPQYNUMINST
+
+Category: us_Consumer_Debt
+  Frequency: W
+  Shape: 5 columns × 470 rows
+  Date Range: 2016-07-03 to 2025-06-29
+  Columns: ACTLISCOUUS, DRALACBS, DRCCLACBS, DTCDISA066MSFRBNY, TOTBORR
+
+================================================================================
+DATA COLLECTION RUN: 2025-09-08 20:48:40
+================================================================================
+
+Category: us_Labor_Wages
+  Frequency: W
+  Shape: 9 columns × 1013 rows
+  Date Range: 2006-03-05 to 2025-07-27
+  Columns: CES0500000003, CE16OV, CIVPART, CLF16OV, ICSA, JTSJOL, PAYEMS, UNRATE, AWHAETP
+
+Category: us_Yields_Rates
+  Frequency: D
+  Shape: 13 columns × 26000 rows
+  Date Range: 1954-07-01 to 2025-09-05
+  Columns: DFF, DGS1, DGS2, DGS3, DGS5, DGS7, DGS10, DGS20, DGS30, DTB3, DTB4WK, DCPF3M, RHORUSQ156N
+
+Category: us_Credit_Spreads
+  Frequency: D
+  Shape: 9 columns × 7581 rows
+  Date Range: 1996-12-31 to 2025-09-05
+  Columns: BAMLH0A0HYM2EY, BAMLHYH0A0HYM2TRIV, BAMLC0A0CMEY, BAMLC1A0C13YEY, BAMLC2A0C35YEY, BAMLC3A0C57YEY, BAMLC4A0C710YEY, BAMLC7A0C1015YEY, BAMLC8A0C15PYEY
+
+Category: us_Production_Output
+  Frequency: M
+  Shape: 9 columns × 1279 rows
+  Date Range: 1919-01-01 to 2025-07-01
+  Columns: INDPRO, MNFCTRIMSA, MNFCTRIRSA, PETROLEUMD11, BUSINV, TTLCONS, IEABC, PATENTUSALLTOTAL, ATLSBUSRGEP
+
+Category: us_Consumption_Spending
+  Frequency: M
+  Shape: 7 columns × 799 rows
+  Date Range: 1959-01-01 to 2025-07-01
+  Columns: DSPIC96, RETAILIMSA, RSCCAS, RSXFS, TOTALSA, TOTALSL, PSAVERT
+
+Category: us_Housing_RealEstate
+  Frequency: W
+  Shape: 5 columns × 2631 rows
+  Date Range: 1975-01-05 to 2025-06-01
+  Columns: CSUSHPINSA, EXHOSLUSM495S, FRGSHPUSM649NCIS, HOSMEDUSM052N, WSHOMCB
+
+Category: us_Trade_External
+  Frequency: M
+  Shape: 1 columns × 403 rows
+  Date Range: 1992-01-01 to 2025-07-01
+  Columns: BOPGSTB
+
+Category: us_Monetary_Aggregates
+  Frequency: W
+  Shape: 5 columns × 2101 rows
+  Date Range: 1980-11-03 to 2021-02-01
+  Columns: M2, M2V, TOTBUSSMSA, TMBACBW027SBOG, RESPPANWW
+
+Category: us_Prices_Inflation
+  Frequency: M
+  Shape: 2 columns × 943 rows
+  Date Range: 1947-01-01 to 2025-07-01
+  Columns: CPIAUCSL, PPIACO
+
+Category: us_GDP_NationalAccounts
+  Frequency: Q
+  Shape: 4 columns × 318 rows
+  Date Range: 1946-01-01 to 2025-04-01
+  Columns: GDP, GDPC1, GDI, A261RX1Q020SBEA
+
+Category: us_Banking_Debt_Stability
+  Frequency: M
+  Shape: 6 columns × 711 rows
+  Date Range: 1966-01-31 to 2025-03-31
+  Columns: GFDEBTN, H8B1058NCBCMG, QBPBSTAS, QBPBSTASSCUSTRSC, QBPQYNTIY, QBPQYNUMINST
+
+Category: us_Consumer_Debt
+  Frequency: W
+  Shape: 5 columns × 470 rows
+  Date Range: 2016-07-03 to 2025-06-29
+  Columns: ACTLISCOUUS, DRALACBS, DRCCLACBS, DTCDISA066MSFRBNY, TOTBORR
+
+================================================================================
+DATA COLLECTION RUN: 2025-09-10 13:46:13
+================================================================================
+
+Category: us_Labor_Wages
+  Frequency: W
+  Shape: 9 columns × 1013 rows
+  Date Range: 2006-03-05 to 2025-07-27
+  Columns: CES0500000003, CE16OV, CIVPART, CLF16OV, ICSA, JTSJOL, PAYEMS, UNRATE, AWHAETP
+
+Category: us_Yields_Rates
+  Frequency: D
+  Shape: 17 columns × 26004 rows
+  Date Range: 1954-07-01 to 2025-09-09
+  Columns: DFF, DGS1, DGS2, DGS3, DGS5, DGS7, DGS10, DGS20, DGS30, DTB3, DTB4WK, DCPF3M, RHORUSQ156N, RIFSPPFAAD90NB, DCPN3M, SOFRINDEX, LIOR3M
+
+Category: us_Credit_Spreads
+  Frequency: D
+  Shape: 9 columns × 7583 rows
+  Date Range: 1996-12-31 to 2025-09-09
+  Columns: BAMLH0A0HYM2EY, BAMLHYH0A0HYM2TRIV, BAMLC0A0CMEY, BAMLC1A0C13YEY, BAMLC2A0C35YEY, BAMLC3A0C57YEY, BAMLC4A0C710YEY, BAMLC7A0C1015YEY, BAMLC8A0C15PYEY
+
+Category: us_Production_Output
+  Frequency: M
+  Shape: 9 columns × 1279 rows
+  Date Range: 1919-01-01 to 2025-07-01
+  Columns: INDPRO, MNFCTRIMSA, MNFCTRIRSA, PETROLEUMD11, BUSINV, TTLCONS, IEABC, PATENTUSALLTOTAL, ATLSBUSRGEP
+
+Category: us_Consumption_Spending
+  Frequency: M
+  Shape: 7 columns × 799 rows
+  Date Range: 1959-01-01 to 2025-07-01
+  Columns: DSPIC96, RETAILIMSA, RSCCAS, RSXFS, TOTALSA, TOTALSL, PSAVERT
+
+Category: us_Housing_RealEstate
+  Frequency: W
+  Shape: 5 columns × 2631 rows
+  Date Range: 1975-01-05 to 2025-06-01
+  Columns: CSUSHPINSA, EXHOSLUSM495S, FRGSHPUSM649NCIS, HOSMEDUSM052N, WSHOMCB
+
+Category: us_Trade_External
+  Frequency: M
+  Shape: 1 columns × 403 rows
+  Date Range: 1992-01-01 to 2025-07-01
+  Columns: BOPGSTB
+
+Category: us_Monetary_Aggregates
+  Frequency: W
+  Shape: 5 columns × 2101 rows
+  Date Range: 1980-11-03 to 2021-02-01
+  Columns: M2, M2V, TOTBUSSMSA, TMBACBW027SBOG, RESPPANWW
+
+Category: us_Prices_Inflation
+  Frequency: M
+  Shape: 2 columns × 943 rows
+  Date Range: 1947-01-01 to 2025-07-01
+  Columns: CPIAUCSL, PPIACO
+
+Category: us_GDP_NationalAccounts
+  Frequency: Q
+  Shape: 4 columns × 318 rows
+  Date Range: 1946-01-01 to 2025-04-01
+  Columns: GDP, GDPC1, GDI, A261RX1Q020SBEA
+
+Category: us_Banking_Debt_Stability
+  Frequency: M
+  Shape: 6 columns × 711 rows
+  Date Range: 1966-01-31 to 2025-03-31
+  Columns: GFDEBTN, H8B1058NCBCMG, QBPBSTAS, QBPBSTASSCUSTRSC, QBPQYNTIY, QBPQYNUMINST
+
+Category: us_Consumer_Debt
+  Frequency: W
+  Shape: 5 columns × 470 rows
+  Date Range: 2016-07-03 to 2025-06-29
+  Columns: ACTLISCOUUS, DRALACBS, DRCCLACBS, DTCDISA066MSFRBNY, TOTBORR
+
+================================================================================
+DATA COLLECTION RUN: 2025-09-10 13:50:15
+================================================================================
+
+Category: us_Labor_Wages
+  Frequency: W
+  Shape: 9 columns × 1013 rows
+  Date Range: 2006-03-05 to 2025-07-27
+  Columns: CES0500000003, CE16OV, CIVPART, CLF16OV, ICSA, JTSJOL, PAYEMS, UNRATE, AWHAETP
+
+Category: us_Yields_Rates
+  Frequency: D
+  Shape: 15 columns × 26004 rows
+  Date Range: 1954-07-01 to 2025-09-09
+  Columns: DFF, DGS1, DGS2, DGS3, DGS5, DGS7, DGS10, DGS20, DGS30, DTB3, DTB4WK, DCPF3M, RIFSPPFAAD90NB, DCPN3M, SOFRINDEX
+
+Category: us_Credit_Spreads
+  Frequency: D
+  Shape: 9 columns × 7583 rows
+  Date Range: 1996-12-31 to 2025-09-09
+  Columns: BAMLH0A0HYM2EY, BAMLHYH0A0HYM2TRIV, BAMLC0A0CMEY, BAMLC1A0C13YEY, BAMLC2A0C35YEY, BAMLC3A0C57YEY, BAMLC4A0C710YEY, BAMLC7A0C1015YEY, BAMLC8A0C15PYEY
+
+Category: us_Production_Output
+  Frequency: M
+  Shape: 9 columns × 1279 rows
+  Date Range: 1919-01-01 to 2025-07-01
+  Columns: INDPRO, MNFCTRIMSA, MNFCTRIRSA, PETROLEUMD11, BUSINV, TTLCONS, IEABC, PATENTUSALLTOTAL, ATLSBUSRGEP
+
+Category: us_Consumption_Spending
+  Frequency: M
+  Shape: 7 columns × 799 rows
+  Date Range: 1959-01-01 to 2025-07-01
+  Columns: DSPIC96, RETAILIMSA, RSCCAS, RSXFS, TOTALSA, TOTALSL, PSAVERT
+
+Category: us_Housing_RealEstate
+  Frequency: W
+  Shape: 5 columns × 2631 rows
+  Date Range: 1975-01-05 to 2025-06-01
+  Columns: CSUSHPINSA, EXHOSLUSM495S, FRGSHPUSM649NCIS, HOSMEDUSM052N, WSHOMCB
+
+Category: us_Trade_External
+  Frequency: M
+  Shape: 1 columns × 403 rows
+  Date Range: 1992-01-01 to 2025-07-01
+  Columns: BOPGSTB
+
+Category: us_Monetary_Aggregates
+  Frequency: W
+  Shape: 5 columns × 2101 rows
+  Date Range: 1980-11-03 to 2021-02-01
+  Columns: M2, M2V, TOTBUSSMSA, TMBACBW027SBOG, RESPPANWW
+
+Category: us_Prices_Inflation
+  Frequency: M
+  Shape: 2 columns × 943 rows
+  Date Range: 1947-01-01 to 2025-07-01
+  Columns: CPIAUCSL, PPIACO
+
+Category: us_GDP_NationalAccounts
+  Frequency: Q
+  Shape: 4 columns × 318 rows
+  Date Range: 1946-01-01 to 2025-04-01
+  Columns: GDP, GDPC1, GDI, A261RX1Q020SBEA
+
+Category: us_Banking_Debt_Stability
+  Frequency: M
+  Shape: 6 columns × 711 rows
+  Date Range: 1966-01-31 to 2025-03-31
+  Columns: GFDEBTN, H8B1058NCBCMG, QBPBSTAS, QBPBSTASSCUSTRSC, QBPQYNTIY, QBPQYNUMINST
+
+Category: us_Consumer_Debt
+  Frequency: W
+  Shape: 5 columns × 470 rows
+  Date Range: 2016-07-03 to 2025-06-29
+  Columns: ACTLISCOUUS, DRALACBS, DRCCLACBS, DTCDISA066MSFRBNY, TOTBORR
+
+================================================================================
+DATA COLLECTION RUN: 2025-09-10 18:17:46
+================================================================================
+
+Category: us_Credit_Spreads
+  Frequency: D
+  Shape: 6 columns × 7583 rows
+  Date Range: 1996-12-31 to 2025-09-09
+  Columns: BAMLC1A0C13YEY, BAMLC2A0C35YEY, BAMLC3A0C57YEY, BAMLC4A0C710YEY, BAMLC7A0C1015YEY, BAMLC8A0C15PYEY
+
+Category: us_Production_Output
+  Frequency: M
+  Shape: 12 columns × 1279 rows
+  Date Range: 1919-01-01 to 2025-07-01
+  Columns: INDPRO, MNFCTRIMSA, MNFCTRIRSA, PETROLEUMD11, BUSINV, TTLCONS, IEABC, PATENTUSALLTOTAL, ATLSBUSRGEP, IPMANSICS, TSIFRGHT, TRUCKD11
+
+Category: us_Consumption_Spending
+  Frequency: M
+  Shape: 7 columns × 799 rows
+  Date Range: 1959-01-01 to 2025-07-01
+  Columns: DSPIC96, RETAILIMSA, RSCCAS, RSXFS, TOTALSA, TOTALSL, PSAVERT
+
+Category: us_Housing_RealEstate
+  Frequency: W
+  Shape: 7 columns × 2631 rows
+  Date Range: 1975-01-05 to 2025-06-01
+  Columns: CSUSHPINSA, EXHOSLUSM495S, FRGSHPUSM649NCIS, HOSMEDUSM052N, WSHOMCB, HPIPONM226S, TLRESCONS
+
+Category: us_Trade_External
+  Frequency: M
+  Shape: 3 columns × 403 rows
+  Date Range: 1992-01-01 to 2025-07-01
+  Columns: BOPGSTB, IR14270, IQ12260
+
+Category: us_Monetary_Aggregates
+  Frequency: W
+  Shape: 5 columns × 2101 rows
+  Date Range: 1980-11-03 to 2021-02-01
+  Columns: M2, M2V, TOTBUSSMSA, TMBACBW027SBOG, RESPPANWW
+
+Category: us_Prices_Inflation
+  Frequency: M
+  Shape: 3 columns × 943 rows
+  Date Range: 1947-01-01 to 2025-07-01
+  Columns: CPIAUCSL, PPIACO, PCE
+
+Category: us_GDP_NationalAccounts
+  Frequency: Q
+  Shape: 4 columns × 318 rows
+  Date Range: 1946-01-01 to 2025-04-01
+  Columns: GDP, GDPC1, GDI, A261RX1Q020SBEA
+
+Category: us_Banking_Debt_Stability
+  Frequency: M
+  Shape: 4 columns × 711 rows
+  Date Range: 1966-01-31 to 2025-03-31
+  Columns: GFDEBTN, H8B1058NCBCMG, QBPBSTAS, QBPBSTASSCUSTRSC
+
+================================================================================
+DATA COLLECTION RUN: 2025-09-10 18:22:40
+================================================================================
+
+Category: us_Labor_Wages
+  Frequency: W
+  Shape: 9 columns × 1013 rows
+  Date Range: 2006-03-05 to 2025-07-27
+  Columns: CES0500000003, CE16OV, CIVPART, CLF16OV, ICSA, JTSJOL, PAYEMS, UNRATE, AWHAETP
+
+Category: us_Yields_Rates
+  Frequency: D
+  Shape: 16 columns × 26004 rows
+  Date Range: 1954-07-01 to 2025-09-09
+  Columns: DFF, DGS1, DGS2, DGS3, DGS5, DGS7, DGS10, DGS20, DGS30, DTB3, DTB4WK, DCPF3M, RIFSPPFAAD90NB, DCPN3M, SOFRINDEX, IUDZOS2
+
+Category: us_Credit_Spreads
+  Frequency: D
+  Shape: 9 columns × 7583 rows
+  Date Range: 1996-12-31 to 2025-09-09
+  Columns: BAMLH0A0HYM2EY, BAMLHYH0A0HYM2TRIV, BAMLC0A0CMEY, BAMLC1A0C13YEY, BAMLC2A0C35YEY, BAMLC3A0C57YEY, BAMLC4A0C710YEY, BAMLC7A0C1015YEY, BAMLC8A0C15PYEY
+
+Category: us_Production_Output
+  Frequency: M
+  Shape: 12 columns × 1279 rows
+  Date Range: 1919-01-01 to 2025-07-01
+  Columns: INDPRO, MNFCTRIMSA, MNFCTRIRSA, PETROLEUMD11, BUSINV, TTLCONS, IEABC, PATENTUSALLTOTAL, ATLSBUSRGEP, IPMANSICS, TSIFRGHT, TRUCKD11
+
+Category: us_Consumption_Spending
+  Frequency: M
+  Shape: 7 columns × 799 rows
+  Date Range: 1959-01-01 to 2025-07-01
+  Columns: DSPIC96, RETAILIMSA, RSCCAS, RSXFS, TOTALSA, TOTALSL, PSAVERT
+
+Category: us_Housing_RealEstate
+  Frequency: W
+  Shape: 7 columns × 2631 rows
+  Date Range: 1975-01-05 to 2025-06-01
+  Columns: CSUSHPINSA, EXHOSLUSM495S, FRGSHPUSM649NCIS, HOSMEDUSM052N, WSHOMCB, HPIPONM226S, TLRESCONS
+
+Category: us_Trade_External
+  Frequency: M
+  Shape: 3 columns × 403 rows
+  Date Range: 1992-01-01 to 2025-07-01
+  Columns: BOPGSTB, IR14270, IQ12260
+
+Category: us_Monetary_Aggregates
+  Frequency: W
+  Shape: 5 columns × 2101 rows
+  Date Range: 1980-11-03 to 2021-02-01
+  Columns: M2, M2V, TOTBUSSMSA, TMBACBW027SBOG, RESPPANWW
+
+Category: us_Prices_Inflation
+  Frequency: M
+  Shape: 3 columns × 943 rows
+  Date Range: 1947-01-01 to 2025-07-01
+  Columns: CPIAUCSL, PPIACO, PCE
+
+Category: us_GDP_NationalAccounts
+  Frequency: Q
+  Shape: 4 columns × 318 rows
+  Date Range: 1946-01-01 to 2025-04-01
+  Columns: GDP, GDPC1, GDI, A261RX1Q020SBEA
+
+Category: us_Banking_Debt_Stability
+  Frequency: M
+  Shape: 6 columns × 711 rows
+  Date Range: 1966-01-31 to 2025-03-31
+  Columns: GFDEBTN, H8B1058NCBCMG, QBPBSTAS, QBPBSTASSCUSTRSC, QBPQYNTIY, QBPQYNUMINST
+
+Category: us_Consumer_Debt
+  Frequency: W
+  Shape: 5 columns × 470 rows
+  Date Range: 2016-07-03 to 2025-06-29
+  Columns: ACTLISCOUUS, DRALACBS, DRCCLACBS, DTCDISA066MSFRBNY, TOTBORR
+
+================================================================================
+DATA COLLECTION RUN: 2025-09-11 12:33:01
+================================================================================
+
+Category: us_Labor_Wages
+  Frequency: W
+  Shape: 9 columns × 1013 rows
+  Date Range: 2006-03-05 to 2025-07-27
+  Columns: CES0500000003, CE16OV, CIVPART, CLF16OV, ICSA, JTSJOL, PAYEMS, UNRATE, AWHAETP
+
+Category: us_Yields_Rates
+  Frequency: D
+  Shape: 16 columns × 26004 rows
+  Date Range: 1954-07-01 to 2025-09-09
+  Columns: DFF, DGS1, DGS2, DGS3, DGS5, DGS7, DGS10, DGS20, DGS30, DTB3, DTB4WK, DCPF3M, RIFSPPFAAD90NB, DCPN3M, SOFRINDEX, IUDZOS2
+
+Category: us_Credit_Spreads
+  Frequency: D
+  Shape: 9 columns × 7584 rows
+  Date Range: 1996-12-31 to 2025-09-10
+  Columns: BAMLH0A0HYM2EY, BAMLHYH0A0HYM2TRIV, BAMLC0A0CMEY, BAMLC1A0C13YEY, BAMLC2A0C35YEY, BAMLC3A0C57YEY, BAMLC4A0C710YEY, BAMLC7A0C1015YEY, BAMLC8A0C15PYEY
+
+Category: us_Production_Output
+  Frequency: M
+  Shape: 12 columns × 1279 rows
+  Date Range: 1919-01-01 to 2025-07-01
+  Columns: INDPRO, MNFCTRIMSA, MNFCTRIRSA, PETROLEUMD11, BUSINV, TTLCONS, IEABC, PATENTUSALLTOTAL, ATLSBUSRGEP, IPMANSICS, TSIFRGHT, TRUCKD11
+
+Category: us_Consumption_Spending
+  Frequency: M
+  Shape: 7 columns × 799 rows
+  Date Range: 1959-01-01 to 2025-07-01
+  Columns: DSPIC96, RETAILIMSA, RSCCAS, RSXFS, TOTALSA, TOTALSL, PSAVERT
+
+Category: us_Housing_RealEstate
+  Frequency: W
+  Shape: 7 columns × 2631 rows
+  Date Range: 1975-01-05 to 2025-06-01
+  Columns: CSUSHPINSA, EXHOSLUSM495S, FRGSHPUSM649NCIS, HOSMEDUSM052N, WSHOMCB, HPIPONM226S, TLRESCONS
+
+Category: us_Trade_External
+  Frequency: M
+  Shape: 3 columns × 403 rows
+  Date Range: 1992-01-01 to 2025-07-01
+  Columns: BOPGSTB, IR14270, IQ12260
+
+Category: us_Monetary_Aggregates
+  Frequency: W
+  Shape: 5 columns × 2101 rows
+  Date Range: 1980-11-03 to 2021-02-01
+  Columns: M2, M2V, TOTBUSSMSA, TMBACBW027SBOG, RESPPANWW
+
+Category: us_Prices_Inflation
+  Frequency: M
+  Shape: 3 columns × 944 rows
+  Date Range: 1947-01-01 to 2025-08-01
+  Columns: CPIAUCSL, PPIACO, PCE
+
+Category: us_GDP_NationalAccounts
+  Frequency: Q
+  Shape: 4 columns × 318 rows
+  Date Range: 1946-01-01 to 2025-04-01
+  Columns: GDP, GDPC1, GDI, A261RX1Q020SBEA
+
+Category: us_Banking_Debt_Stability
+  Frequency: M
+  Shape: 6 columns × 711 rows
+  Date Range: 1966-01-31 to 2025-03-31
+  Columns: GFDEBTN, H8B1058NCBCMG, QBPBSTAS, QBPBSTASSCUSTRSC, QBPQYNTIY, QBPQYNUMINST
+
+Category: us_Consumer_Debt
+  Frequency: W
+  Shape: 5 columns × 470 rows
+  Date Range: 2016-07-03 to 2025-06-29
+  Columns: ACTLISCOUUS, DRALACBS, DRCCLACBS, DTCDISA066MSFRBNY, TOTBORR
+
+================================================================================
+DATA COLLECTION RUN: 2025-09-12 19:16:20
+================================================================================
+
+Category: us_Labor_Wages
+  Frequency: W
+  Shape: 9 columns × 1013 rows
+  Date Range: 2006-03-05 to 2025-07-27
+  Columns: CES0500000003, CE16OV, CIVPART, CLF16OV, ICSA, JTSJOL, PAYEMS, UNRATE, AWHAETP
+
+Category: us_Yields_Rates
+  Frequency: D
+  Shape: 16 columns × 26006 rows
+  Date Range: 1954-07-01 to 2025-09-11
+  Columns: DFF, DGS1, DGS2, DGS3, DGS5, DGS7, DGS10, DGS20, DGS30, DTB3, DTB4WK, DCPF3M, RIFSPPFAAD90NB, DCPN3M, SOFRINDEX, IUDZOS2
+
+Category: us_Credit_Spreads
+  Frequency: D
+  Shape: 9 columns × 7585 rows
+  Date Range: 1996-12-31 to 2025-09-11
+  Columns: BAMLH0A0HYM2EY, BAMLHYH0A0HYM2TRIV, BAMLC0A0CMEY, BAMLC1A0C13YEY, BAMLC2A0C35YEY, BAMLC3A0C57YEY, BAMLC4A0C710YEY, BAMLC7A0C1015YEY, BAMLC8A0C15PYEY
+
+Category: us_Production_Output
+  Frequency: M
+  Shape: 12 columns × 1279 rows
+  Date Range: 1919-01-01 to 2025-07-01
+  Columns: INDPRO, MNFCTRIMSA, MNFCTRIRSA, PETROLEUMD11, BUSINV, TTLCONS, IEABC, PATENTUSALLTOTAL, ATLSBUSRGEP, IPMANSICS, TSIFRGHT, TRUCKD11
+
+Category: us_Consumption_Spending
+  Frequency: M
+  Shape: 7 columns × 799 rows
+  Date Range: 1959-01-01 to 2025-07-01
+  Columns: DSPIC96, RETAILIMSA, RSCCAS, RSXFS, TOTALSA, TOTALSL, PSAVERT
+
+Category: us_Housing_RealEstate
+  Frequency: W
+  Shape: 7 columns × 2631 rows
+  Date Range: 1975-01-05 to 2025-06-01
+  Columns: CSUSHPINSA, EXHOSLUSM495S, FRGSHPUSM649NCIS, HOSMEDUSM052N, WSHOMCB, HPIPONM226S, TLRESCONS
+
+Category: us_Trade_External
+  Frequency: M
+  Shape: 3 columns × 403 rows
+  Date Range: 1992-01-01 to 2025-07-01
+  Columns: BOPGSTB, IR14270, IQ12260
+
+Category: us_Monetary_Aggregates
+  Frequency: W
+  Shape: 5 columns × 2101 rows
+  Date Range: 1980-11-03 to 2021-02-01
+  Columns: M2, M2V, TOTBUSSMSA, TMBACBW027SBOG, RESPPANWW
+
+Category: us_Prices_Inflation
+  Frequency: M
+  Shape: 3 columns × 944 rows
+  Date Range: 1947-01-01 to 2025-08-01
+  Columns: CPIAUCSL, PPIACO, PCE
+
+Category: us_GDP_NationalAccounts
+  Frequency: Q
+  Shape: 4 columns × 318 rows
+  Date Range: 1946-01-01 to 2025-04-01
+  Columns: GDP, GDPC1, GDI, A261RX1Q020SBEA
+
+Category: us_Banking_Debt_Stability
+  Frequency: M
+  Shape: 6 columns × 711 rows
+  Date Range: 1966-01-31 to 2025-03-31
+  Columns: GFDEBTN, H8B1058NCBCMG, QBPBSTAS, QBPBSTASSCUSTRSC, QBPQYNTIY, QBPQYNUMINST
+
+Category: us_Consumer_Debt
+  Frequency: W
+  Shape: 5 columns × 474 rows
+  Date Range: 2016-07-03 to 2025-07-27
+  Columns: ACTLISCOUUS, DRALACBS, DRCCLACBS, DTCDISA066MSFRBNY, TOTBORR

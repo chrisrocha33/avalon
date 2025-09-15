@@ -1,0 +1,9 @@
+/* Sectors analysis page styles (scoped) */
+body.sectors .page-intro h1 { font-size: 2rem; }
+body.sectors .badge { display: inline-block; padding: 3px 10px; border: 1px solid var(--color-border); border-radius: 20px; font-size: 12px; margin-right: 8px; background: #0f172a; color: #cbd5e1; }
+body.sectors .section { margin: 28px 0; padding: 20px 22px; }
+body.sectors .imgwrap { margin: 12px 0; text-align: center; }
+body.sectors .grid { grid-template-columns: repeat(auto-fit, minmax(400px,1fr)); }
+body.sectors .small { color: var(--color-muted); }
+
+

@@ -1,0 +1,113 @@
+{
+  "us_Labor_Wages": [
+    "CES0500000003",
+    "CE16OV",
+    "CIVPART",
+    "CLF16OV",
+    "ICSA",
+    "JTSJOL",
+    "PAYEMS",
+    "UNRATE",
+    "AWHAETP"
+  ],
+  "us_Yields_Rates": [
+    "DFF",
+    "DGS1",
+    "DGS2",
+    "DGS3",
+    "DGS5",
+    "DGS7",
+    "DGS10",
+    "DGS20",
+    "DGS30",
+    "DTB3",
+    "DTB4WK",
+    "DCPF3M",
+    "RIFSPPFAAD90NB",
+    "DCPN3M",
+    "SOFRINDEX",
+    "IUDZOS2"
+  ],
+  "us_Credit_Spreads": [
+    "BAMLH0A0HYM2EY",
+    "BAMLHYH0A0HYM2TRIV",
+    "BAMLC0A0CMEY",
+    "BAMLC1A0C13YEY",
+    "BAMLC2A0C35YEY",
+    "BAMLC3A0C57YEY",
+    "BAMLC4A0C710YEY",
+    "BAMLC7A0C1015YEY",
+    "BAMLC8A0C15PYEY"
+  ],
+  "us_Production_Output": [
+    "INDPRO",
+    "MNFCTRIMSA",
+    "MNFCTRIRSA",
+    "PETROLEUMD11",
+    "BUSINV",
+    "TTLCONS",
+    "IEABC",
+    "PATENTUSALLTOTAL",
+    "ATLSBUSRGEP",
+    "IPMANSICS",
+    "TSIFRGHT",
+    "TRUCKD11"
+  ],
+  "us_Consumption_Spending": [
+    "DSPIC96",
+    "RETAILIMSA",
+    "RSCCAS",
+    "RSXFS",
+    "TOTALSA",
+    "TOTALSL",
+    "PSAVERT"
+  ],
+  "us_Housing_RealEstate": [
+    "CSUSHPINSA",
+    "EXHOSLUSM495S",
+    "FRGSHPUSM649NCIS",
+    "HOSMEDUSM052N",
+    "WSHOMCB",
+    "HPIPONM226S",
+    "TLRESCONS"
+  ],
+  "us_Trade_External": [
+    "BOPGSTB",
+    "IR14270",
+    "IQ12260"
+  ],
+  "us_Monetary_Aggregates": [
+    "M2",
+    "M2V",
+    "TOTBUSSMSA",
+    "TMBACBW027SBOG",
+    "RESPPANWW"
+  ],
+  "us_Prices_Inflation": [
+    "CPIAUCSL",
+    "PPIACO",
+    "PCE"
+  ],
+  "us_GDP_NationalAccounts": [
+    "GDP",
+    "GDPC1",
+    "GDI",
+    "A261RX1Q020SBEA",
+    "DGPC1"
+  ],
+  "us_Banking_Debt_Stability": [
+    "GFDEBTN",
+    "H8B1058NCBCMG",
+    "QBPBSTAS",
+    "QBPBSTASSCUSTRSC",
+    "QBPQYNTIY",
+    "QBPQYNUMINST"
+  ],
+  "us_Consumer_Debt": [
+    "ACTLISCOUUS",
+    "DRALACBS",
+    "DRCCLACBS",
+    "DTCDISA066MSFRBNY",
+    "TOTBORR"
+  ]
+}

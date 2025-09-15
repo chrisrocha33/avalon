@@ -1,0 +1,8 @@
+/* Analysis complete page styles (scoped) */
+body.analysis-complete .container { text-align: center; max-width: 640px; padding: 32px; background: rgba(6, 20, 32, 0.6); border: 1px solid var(--color-border); border-radius: 24px; box-shadow: var(--shadow-2); }
+body.analysis-complete .status-icon { font-size: 3rem; margin-bottom: 12px; }
+body.analysis-complete .message { font-size: 1.1rem; color: #e5e7eb; }
+body.analysis-complete .timestamp { color: var(--color-muted); margin: 16px 0 28px; }
+body.analysis-complete .button { margin: 0 8px; }
+
+

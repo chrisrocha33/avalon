@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+  <div class="page-intro">
+    <h1>US Yields Analysis</h1>
+    <div class="small">Generated {{ date }}</div>
+  </div>
+
+  <!-- 0) Yield Curve (Latest Snapshot) -->
+  <div class="section">
+    <div class="section-header">
+      <h2>0. Yield Curve (Latest)</h2>
+    </div>
+    <div class="imgwrap center">
+      {% if yield_curve_plot_b64 %}
+      <img src="data:image/png;base64,{{ yield_curve_plot_b64 }}" alt="Yield Curve">
+      {% else %}
+      <p class="small">No yield curve available</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- 1) Curve Slope / Spreads -->
+  <div class="section">
+    <div class="section-header">
+      <h2>1. Curve Slope / Spreads</h2>
+    </div>
+    <div class="small">Regime: {{ spreads_regime_flag }}</div>
+    <div class="imgwrap center">
+      {% if spreads_plot_b64 %}
+      <img src="data:image/png;base64,{{ spreads_plot_b64 }}" alt="Spreads">
+      {% else %}
+      <p class="small">No spreads plot available</p>
+      {% endif %}
+    </div>
+    <h3>Spreads Table (Recent)</h3>
+    {{ spreads_table_html | safe }}
+  </div>
+
+  <!-- 2) PCA of the Yield Curve -->
+  <div class="section">
+    <div class="section-header">
+      <h2>2. PCA-style Factors (Level, Slope, Curvature)</h2>
+    </div>
+    <h3>Factor Loadings (Illustrative)</h3>
+    <div class="imgwrap center">
+      {% if pca_loadings_plot_b64 %}
+      <img src="data:image/png;base64,{{ pca_loadings_plot_b64 }}" alt="PCA Loadings">
+      {% else %}
+      <p class="small">No loadings available</p>
+      {% endif %}
+    </div>
+    <h3>Factor Scores (Recent)</h3>
+    <div class="imgwrap center">
+      {% if pca_scores_plot_b64 %}
+      <img src="data:image/png;base64,{{ pca_scores_plot_b64 }}" alt="PCA Scores">
+      {% else %}
+      <p class="small">No factor scores available</p>
+      {% endif %}
+    </div>
+    <h3>Latest Factor Snapshot</h3>
+    {{ pca_snapshot_html | safe }}
+  </div>
+
+  <!-- 3) Forward Rates -->
+  <div class="section">
+    <div class="section-header">
+      <h2>3. Forward Rates (1y1y, 5y5y)</h2>
+    </div>
+    <div class="imgwrap center">
+      {% if forwards_plot_b64 %}
+      <img src="data:image/png;base64,{{ forwards_plot_b64 }}" alt="Forward Rates">
+      {% else %}
+      <p class="small">No forward rates plot available</p>
+      {% endif %}
+    </div>
+    <h3>Forward Rates (Recent)</h3>
+    {{ forwards_table_html | safe }}
+  </div>
+
+  <!-- 4) Term Premium -->
+  <div class="section">
+    <div class="section-header">
+      <h2>4. Term Premium (Proxy)</h2>
+    </div>
+    <div class="imgwrap center">
+      {% if term_premium_plot_b64 %}
+      <img src="data:image/png;base64,{{ term_premium_plot_b64 }}" alt="Term Premium">
+      {% else %}
+      <p class="small">No term premium plot available</p>
+      {% endif %}
+    </div>
+    <h3>Term Premium Details (Recent)</h3>
+    {{ term_premium_table_html | safe }}
+  </div>
+
+  <!-- 5) Duration / Convexity -->
+  <div class="section">
+    <div class="section-header">
+      <h2>5. Duration / Convexity Profiles</h2>
+    </div>
+    <div class="imgwrap center">
+      {% if duration_convexity_plot_b64 %}
+      <img src="data:image/png;base64,{{ duration_convexity_plot_b64 }}" alt="Duration and Convexity">
+      {% else %}
+      <p class="small">No duration/convexity plot available</p>
+      {% endif %}
+    </div>
+    <h3>Profile Table</h3>
+    {{ duration_table_html | safe }}
+  </div>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}500 - Internal Server Error{% endblock %}
+{% block content %}
+  <div class="error-container">
+    <div class="error-code">500</div>
+    <div class="error-message">Internal Server Error</div>
+    <div class="error-description">
+      Something went wrong on our end. We're working to fix the issue.
+      Please try again later or contact support if the problem persists.
+    </div>
+    <a href="{{ url_for('home.index') }}" class="home-button button button-primary">Back to Dashboard</a>
+  </div>
+{% endblock %}

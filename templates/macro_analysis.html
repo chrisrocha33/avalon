@@ -1,0 +1,185 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block content %}
+  <div class="page-intro">
+    <h1>DSGE Macro Model Analysis</h1>
+    <div class="small">Generated {{ date }}</div>
+  </div>
+
+  <section class="card">
+    <h2>Model Highlights</h2>
+    <ul>
+      {% for item in highlights %}
+        <li><strong>{{ item.label }}:</strong> {{ item.value }}</li>
+      {% endfor %}
+    </ul>
+    <div class="meta">
+      <span>Sample: {{ data_start_date }} → {{ data_end_date }}</span>
+      <span>Observations: {{ total_observations }}</span>
+    </div>
+  </section>
+
+  <!-- Data Snapshot & Stats -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Dataset Snapshot</h2>
+    </div>
+    <div class="small">Start: {{ data_start_date }} | End: {{ data_end_date }} | Observations: {{ total_observations }}</div>
+
+    <h3>Snapshot Statistics</h3>
+    {% if snapshot_stats %}
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Series</th>
+          <th>Mean</th>
+          <th>Count</th>
+          <th>Std</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in snapshot_stats %}
+        <tr>
+          <td style="text-align:left;">{{ row.series }}</td>
+          <td style="text-align:left;">{{ row.label if row.label else row.series }}</td>
+          <td>{{ "%.3f"|format(row.mean) if row.mean is not none else "N/A" }}</td>
+          <td>{{ row.count if row.count is not none else "N/A" }}</td>
+          <td>{{ "%.3f"|format(row.std) if row.std is not none else "N/A" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="small">Snapshot statistics not available</p>
+    {% endif %}
+  </div>
+
+  <!-- Data Overview Plot -->
+  <div class="section">
+    <div class="section-header">
+      <h2>1. Data Overview & Quality</h2>
+    </div>
+    <div class="imgwrap center">
+      {% if data_overview_plot %}
+      <img src="{{ data_overview_plot }}" alt="Data Overview">
+      {% else %}
+      <p class="small">Data overview plot not available</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Model Inputs -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Model Inputs</h2>
+    </div>
+    {% if model_inputs %}
+    <table>
+      <thead>
+        <tr>
+          <th>Variable</th>
+          <th>Value</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in model_inputs %}
+        <tr>
+          <td style="text-align:left;">{{ p.name }}</td>
+          <td>{{ "%.3f"|format(p.value) if p.value is number else (p.value if p.value is not none else "N/A") }}</td>
+          <td style="text-align:left;">{{ p.description }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="small">No model inputs available</p>
+    {% endif %}
+  </div>
+
+  <!-- Model Estimation -->
+  <div class="section">
+    <div class="section-header">
+      <h2>2. Model Estimation Results</h2>
+    </div>
+    <div class="imgwrap center">
+      {% if model_estimation_plot %}
+      <img src="{{ model_estimation_plot }}" alt="Model Estimation">
+      {% else %}
+      <p class="small">Model estimation plot not available</p>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if show_shock_analysis %}
+  <!-- Policy Shock Analysis -->
+  <div class="section">
+    <div class="section-header">
+      <h2>3. Policy Shock Analysis (+100bp)</h2>
+    </div>
+    <div class="imgwrap center">
+      {% if policy_shock_plot %}
+      <img src="{{ policy_shock_plot }}" alt="Policy Shock Analysis">
+      {% else %}
+      <p class="small">Policy shock analysis plot not available</p>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Diagnostics -->
+  <div class="section">
+    <div class="section-header">
+      <h2>4. Model Diagnostics</h2>
+    </div>
+    <div class="imgwrap center">
+      {% if model_diagnostics_plot %}
+      <img src="{{ model_diagnostics_plot }}" alt="Model Diagnostics">
+      {% else %}
+      <p class="small">Diagnostics plot not available</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Economic Insights -->
+  <div class="section">
+    <div class="section-header">
+      <h2>5. Economic Insights & Policy Analysis</h2>
+    </div>
+    <div class="imgwrap center">
+      {% if economic_insights_plot %}
+      <img src="{{ economic_insights_plot }}" alt="Economic Insights">
+      {% else %}
+      <p class="small">Economic insights plot not available</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Latest Model Output (from SQL) -->
+  <div class="section">
+    <div class="section-header">
+      <h2>Latest Model Output Snapshot</h2>
+    </div>
+    {% if latest_model_output %}
+    <table>
+      <thead>
+        <tr>
+          <th>Field</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in latest_model_output %}
+        <tr>
+          <td style="text-align:left;">{{ row.label if row.label else row.key }}</td>
+          <td>{{ row.value if row.value is not none else "N/A" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="small">Latest model output not available</p>
+    {% endif %}
+  </div>
+{% endblock %} 

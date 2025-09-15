@@ -1,0 +1,42 @@
+{
+    "Mercado Laboral": [
+        "SL136",
+        "SL137",
+        "SL138"
+    ],
+    "Salarios": [
+        "SL2827",
+        "SL2828",
+        "SL2829",
+        "SL2830"
+    ],
+    "Producción Industrial": [
+        "CR203"
+    ],
+    "Curva de Rendimiento": [
+        "SF61745",
+        "SF60648",
+        "SF60649",
+        "SF60633"
+    ],
+    "Crédito y Deuda de Consumo": [
+        "SF311408",
+        "SF311418",
+        "SF311433"
+    ],
+    "Inflación y Precios": [
+        "SP1"
+    ],
+    "Tipos de Cambio": [
+        "SF60632",
+        "SF43718",
+        "SF60653",
+        "SF46410",
+        "SF46407",
+        "SF46406"
+    ],
+    "Comercio": [],
+    "Vivienda": [],
+    "PIB y Crecimiento": [],
+    "Producción de Petróleo": []
+} 

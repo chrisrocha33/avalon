@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ ticker }} - Quick Stock Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+</head>
+<body class="quick-report">
+    <div class="container">
+        <!-- Back Link -->
+        <a href="/" class="back-link">← Back to Dashboard</a>
+        
+        <!-- Header -->
+        <div class="header">
+            <h1>{{ ticker }} Quick Stock Report</h1>
+            <div class="date">Generated on {{ date }}</div>
+        </div>
+        
+        <!-- Summary Statistics -->
+        <div class="summary-grid">
+            <div class="summary-card">
+                <h3>Current Price</h3>
+                <div class="value">${{ "%.2f"|format(summary_stats.current_price) }}</div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>1-Day Change</h3>
+                <div class="value">
+                    {% if summary_stats.price_change_1d %}
+                        {% set change = summary_stats.price_change_1d * 100 %}
+                        {% if change > 0 %}
+                            <span class="change positive">+{{ "%.2f"|format(change) }}%</span>
+                        {% elif change < 0 %}
+                            <span class="change negative">{{ "%.2f"|format(change) }}%</span>
+                        {% else %}
+                            <span class="change neutral">0.00%</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="change neutral">N/A</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>1-Week Change</h3>
+                <div class="value">
+                    {% if summary_stats.price_change_1w %}
+                        {% set change = summary_stats.price_change_1w * 100 %}
+                        {% if change > 0 %}
+                            <span class="change positive">+{{ "%.2f"|format(change) }}%</span>
+                        {% elif change < 0 %}
+                            <span class="change negative">{{ "%.2f"|format(change) }}%</span>
+                        {% else %}
+                            <span class="change neutral">0.00%</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="change neutral">N/A</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>1-Month Change</h3>
+                <div class="value">
+                    {% if summary_stats.price_change_1m %}
+                        {% set change = summary_stats.price_change_1m * 100 %}
+                        {% if change > 0 %}
+                            <span class="change positive">+{{ "%.2f"|format(change) }}%</span>
+                        {% elif change < 0 %}
+                            <span class="change negative">{{ "%.2f"|format(change) }}%</span>
+                        {% else %}
+                            <span class="change neutral">0.00%</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="change neutral">N/A</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>20-Day Volatility</h3>
+                <div class="value">
+                    {% if summary_stats.volatility_20d %}
+                        {{ "%.2f"|format(summary_stats.volatility_20d * 100) }}%
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>RSI</h3>
+                <div class="value">
+                    {% if summary_stats.rsi %}
+                        {{ "%.1f"|format(summary_stats.rsi) }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="summary-card">
+                <h3>60-Day Beta</h3>
+                <div class="value">
+                    {% if summary_stats.beta_60d %}
+                        {{ "%.2f"|format(summary_stats.beta_60d) }}
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if summary_stats.latest_revenue %}
+            <div class="summary-card">
+                <h3>Latest Revenue</h3>
+                <div class="value">${{ "{:,.1f}M".format(summary_stats.latest_revenue / 1000000) }}</div>
+                <div class="small">Most Recent Period</div>
+            </div>
+            {% endif %}
+            
+            {% if summary_stats.latest_operating_margin %}
+            <div class="summary-card">
+                <h3>Operating Margin</h3>
+                <div class="value">
+                    {% if summary_stats.latest_operating_margin > 0 %}
+                        <span class="change positive">{{ "%.1f"|format(summary_stats.latest_operating_margin) }}%</span>
+                    {% elif summary_stats.latest_operating_margin < 0 %}
+                        <span class="change negative">{{ "%.1f"|format(summary_stats.latest_operating_margin) }}%</span>
+                    {% else %}
+                        <span class="change neutral">{{ "%.1f"|format(summary_stats.latest_operating_margin) }}%</span>
+                    {% endif %}
+                </div>
+                <div class="small">Latest Period</div>
+            </div>
+            {% endif %}
+            
+            {% if summary_stats.latest_net_margin %}
+            <div class="summary-card">
+                <h3>Net Margin</h3>
+                <div class="value">
+                    {% if summary_stats.latest_net_margin > 0 %}
+                        <span class="change positive">{{ "%.1f"|format(summary_stats.latest_net_margin) }}%</span>
+                    {% elif summary_stats.latest_net_margin < 0 %}
+                        <span class="change negative">{{ "%.1f"|format(summary_stats.latest_net_margin) }}%</span>
+                    {% else %}
+                        <span class="change neutral">{{ "%.1f"|format(summary_stats.latest_net_margin) }}%</span>
+                    {% endif %}
+                </div>
+                <div class="small">Latest Period</div>
+            </div>
+            {% endif %}
+            
+            {% if summary_stats.revenue_growth_yoy %}
+            <div class="summary-card">
+                <h3>Revenue Growth</h3>
+                <div class="value">
+                    {% if summary_stats.revenue_growth_yoy > 0 %}
+                        <span class="change positive">+{{ "%.1f"|format(summary_stats.revenue_growth_yoy) }}%</span>
+                    {% elif summary_stats.revenue_growth_yoy < 0 %}
+                        <span class="change negative">{{ "%.1f"|format(summary_stats.revenue_growth_yoy) }}%</span>
+                    {% else %}
+                        <span class="change neutral">{{ "%.1f"|format(summary_stats.revenue_growth_yoy) }}%</span>
+                    {% endif %}
+                </div>
+                <div class="small">Year-over-Year</div>
+            </div>
+            {% endif %}
+            
+            {% if summary_stats.latest_debt_to_equity %}
+            <div class="summary-card">
+                <h3>Debt-to-Equity</h3>
+                <div class="value">
+                    {% if summary_stats.latest_debt_to_equity > 1.0 %}
+                        <span class="change negative">{{ "%.2f"|format(summary_stats.latest_debt_to_equity) }}</span>
+                    {% elif summary_stats.latest_debt_to_equity > 0.5 %}
+                        <span class="change neutral">{{ "%.2f"|format(summary_stats.latest_debt_to_equity) }}</span>
+                    {% else %}
+                        <span class="change positive">{{ "%.2f"|format(summary_stats.latest_debt_to_equity) }}</span>
+                    {% endif %}
+                </div>
+                <div class="small">Latest Period</div>
+            </div>
+            {% endif %}
+            
+            {% if summary_stats.latest_debt_to_assets %}
+            <div class="summary-card">
+                <h3>Debt-to-Assets</h3>
+                <div class="value">
+                    {% if summary_stats.latest_debt_to_assets > 0.5 %}
+                        <span class="change negative">{{ "%.2f"|format(summary_stats.latest_debt_to_assets) }}</span>
+                    {% elif summary_stats.latest_debt_to_assets > 0.3 %}
+                        <span class="change neutral">{{ "%.2f"|format(summary_stats.latest_debt_to_assets) }}</span>
+                    {% else %}
+                        <span class="change positive">{{ "%.2f"|format(summary_stats.latest_debt_to_assets) }}</span>
+                    {% endif %}
+                </div>
+                <div class="small">Latest Period</div>
+            </div>
+            {% endif %}
+            
+            {% if summary_stats.latest_interest_coverage %}
+            <div class="summary-card">
+                <h3>Interest Coverage</h3>
+                <div class="value">
+                    {% if summary_stats.latest_interest_coverage > 3.0 %}
+                        <span class="change positive">{{ "%.1f"|format(summary_stats.latest_interest_coverage) }}</span>
+                    {% elif summary_stats.latest_interest_coverage > 1.5 %}
+                        <span class="change neutral">{{ "%.1f"|format(summary_stats.latest_interest_coverage) }}</span>
+                    {% else %}
+                        <span class="change negative">{{ "%.1f"|format(summary_stats.latest_interest_coverage) }}</span>
+                    {% endif %}
+                </div>
+                <div class="small">Latest Period</div>
+            </div>
+            {% endif %}
+            
+            {% if summary_stats.latest_capex %}
+            <div class="summary-card">
+                <h3>Latest CAPEX</h3>
+                <div class="value">${{ "{:,.1f}M".format(summary_stats.latest_capex / 1000000) }}</div>
+                <div class="small">Most Recent Period</div>
+            </div>
+            {% endif %}
+            
+            {% if summary_stats.capex_growth_yoy %}
+            <div class="summary-card">
+                <h3>CAPEX Growth</h3>
+                <div class="value">
+                    {% if summary_stats.capex_growth_yoy > 0 %}
+                        <span class="change positive">+{{ "%.1f"|format(summary_stats.capex_growth_yoy) }}%</span>
+                    {% elif summary_stats.capex_growth_yoy < 0 %}
+                        <span class="change negative">{{ "%.1f"|format(summary_stats.capex_growth_yoy) }}%</span>
+                    {% else %}
+                        <span class="change neutral">{{ "%.1f"|format(summary_stats.capex_growth_yoy) }}%</span>
+                    {% endif %}
+                </div>
+                <div class="small">Year-over-Year</div>
+            </div>
+            {% endif %}
+            
+            {% if summary_stats.latest_current_ratio %}
+            <div class="summary-card">
+                <h3>Current Ratio</h3>
+                <div class="value">
+                    {% if summary_stats.latest_current_ratio > 2.0 %}
+                        <span class="change positive">{{ "%.2f"|format(summary_stats.latest_current_ratio) }}</span>
+                    {% elif summary_stats.latest_current_ratio > 1.0 %}
+                        <span class="change neutral">{{ "%.2f"|format(summary_stats.latest_current_ratio) }}</span>
+                    {% else %}
+                        <span class="change negative">{{ "%.2f"|format(summary_stats.latest_current_ratio) }}</span>
+                    {% endif %}
+                </div>
+                <div class="small">Latest Period</div>
+            </div>
+            {% endif %}
+            
+            {% if summary_stats.latest_quick_ratio %}
+            <div class="summary-card">
+                <h3>Quick Ratio</h3>
+                <div class="value">
+                    {% if summary_stats.latest_quick_ratio > 1.0 %}
+                        <span class="change positive">{{ "%.2f"|format(summary_stats.latest_quick_ratio) }}</span>
+                    {% elif summary_stats.latest_quick_ratio > 0.5 %}
+                        <span class="change neutral">{{ "%.2f"|format(summary_stats.latest_quick_ratio) }}</span>
+                    {% else %}
+                        <span class="change negative">{{ "%.2f"|format(summary_stats.latest_quick_ratio) }}</span>
+                    {% endif %}
+                </div>
+                <div class="small">Latest Period</div>
+            </div>
+            {% endif %}
+            
+            {% if summary_stats.latest_cash_ratio %}
+            <div class="summary-card">
+                <h3>Cash Ratio</h3>
+                <div class="value">
+                    {% if summary_stats.latest_cash_ratio > 0.5 %}
+                        <span class="change positive">{{ "%.2f"|format(summary_stats.latest_cash_ratio) }}</span>
+                    {% elif summary_stats.latest_cash_ratio > 0.2 %}
+                        <span class="change neutral">{{ "%.2f"|format(summary_stats.latest_cash_ratio) }}</span>
+                    {% else %}
+                        <span class="change negative">{{ "%.2f"|format(summary_stats.latest_cash_ratio) }}</span>
+                    {% endif %}
+                </div>
+                <div class="small">Latest Period</div>
+            </div>
+            {% endif %}
+            
+            {% if summary_stats.latest_working_capital_ratio %}
+            <div class="summary-card">
+                <h3>Working Capital Ratio</h3>
+                <div class="value">
+                    {% if summary_stats.latest_working_capital_ratio > 0.2 %}
+                        <span class="change positive">{{ "%.2f"|format(summary_stats.latest_working_capital_ratio) }}</span>
+                    {% elif summary_stats.latest_working_capital_ratio > 0.1 %}
+                        <span class="change neutral">{{ "%.2f"|format(summary_stats.latest_working_capital_ratio) }}</span>
+                    {% else %}
+                        <span class="change negative">{{ "%.2f"|format(summary_stats.latest_working_capital_ratio) }}</span>
+                    {% endif %}
+                </div>
+                <div class="small">Latest Period</div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <!-- Price and Moving Averages -->
+        {% if plots.price_ma %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Price Action & Moving Averages</h2>
+            </div>
+            <div class="section-content">
+                <div class="plot-container">
+                    <img src="data:image/png;base64,{{ plots.price_ma }}" alt="Price and Moving Averages">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Technical Indicators -->
+        {% if plots.technical_indicators %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Technical Indicators</h2>
+            </div>
+            <div class="section-content">
+                <div class="plot-container">
+                    <img src="data:image/png;base64,{{ plots.technical_indicators }}" alt="Technical Indicators">
+                </div>
+                <div class="info-box">
+                    <h4>Technical Analysis Summary</h4>
+                    <p>This chart shows key technical indicators including RSI (Relative Strength Index), MACD (Moving Average Convergence Divergence), Bollinger Bands, and volatility measures. These indicators help identify potential entry/exit points and market momentum.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Advanced Technical Indicators -->
+        {% if plots.advanced_indicators %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Advanced Technical Indicators</h2>
+            </div>
+            <div class="section-content">
+                <div class="plot-container">
+                    <img src="data:image/png;base64,{{ plots.advanced_indicators }}" alt="Advanced Technical Indicators">
+                </div>
+                <div class="info-box">
+                    <h4>Advanced Technical Analysis</h4>
+                    <p>This chart displays advanced technical indicators including Williams %R, Stochastic Oscillator, Average True Range (ATR), and Commodity Channel Index (CCI). These indicators provide additional insights into momentum, volatility, and overbought/oversold conditions.</p>
+                </div>
+                
+                {% if advanced_metrics %}
+                <div class="summary-grid" style="margin-top: 20px;">
+                    <div class="summary-card">
+                        <h3>Williams %R</h3>
+                        <div class="value">{{ "%.1f"|format(advanced_metrics.Williams_R) }}</div>
+                        <div class="small">
+                            {% if advanced_metrics.Williams_R > -20 %}
+                                <span class="change negative">Overbought</span>
+                            {% elif advanced_metrics.Williams_R < -80 %}
+                                <span class="change positive">Oversold</span>
+                            {% else %}
+                                <span class="change neutral">Neutral</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>Stochastic %K</h3>
+                        <div class="value">{{ "%.1f"|format(advanced_metrics.Stoch_K) }}</div>
+                        <div class="small">
+                            {% if advanced_metrics.Stoch_K > 80 %}
+                                <span class="change negative">Overbought</span>
+                            {% elif advanced_metrics.Stoch_K < 20 %}
+                                <span class="change positive">Oversold</span>
+                            {% else %}
+                                <span class="change neutral">Neutral</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>Stochastic %D</h3>
+                        <div class="value">{{ "%.1f"|format(advanced_metrics.Stoch_D) }}</div>
+                        <div class="small">
+                            {% if advanced_metrics.Stoch_D > 80 %}
+                                <span class="change negative">Overbought</span>
+                            {% elif advanced_metrics.Stoch_D < 20 %}
+                                <span class="change positive">Oversold</span>
+                            {% else %}
+                                <span class="change neutral">Neutral</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>ATR</h3>
+                        <div class="value">${{ "%.2f"|format(advanced_metrics.ATR) }}</div>
+                        <div class="small">Volatility Measure</div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>CCI</h3>
+                        <div class="value">{{ "%.1f"|format(advanced_metrics.CCI) }}</div>
+                        <div class="small">
+                            {% if advanced_metrics.CCI > 100 %}
+                                <span class="change negative">Overbought</span>
+                            {% elif advanced_metrics.CCI < -100 %}
+                                <span class="change positive">Oversold</span>
+                            {% else %}
+                                <span class="change neutral">Neutral</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Risk Analysis -->
+        {% if risk_analysis %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Risk Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h3>1-Day VaR (95%)</h3>
+                        <div class="value">
+                            {% if risk_analysis.VaR_95_1d %}
+                                {{ "%.2f"|format(risk_analysis.VaR_95_1d * 100) }}%
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                        <div class="small">Value at Risk</div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>5-Day VaR (95%)</h3>
+                        <div class="value">
+                            {% if risk_analysis.VaR_95_5d %}
+                                {{ "%.2f"|format(risk_analysis.VaR_95_5d * 100) }}%
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                        <div class="small">Weekly Risk</div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>20-Day VaR (95%)</h3>
+                        <div class="value">
+                            {% if risk_analysis.VaR_95_20d %}
+                                {{ "%.2f"|format(risk_analysis.VaR_95_20d * 100) }}%
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                        <div class="small">Monthly Risk</div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>Expected Shortfall</h3>
+                        <div class="value">
+                            {% if risk_analysis.CVaR_95_1d %}
+                                {{ "%.2f"|format(risk_analysis.CVaR_95_1d * 100) }}%
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                        <div class="small">Conditional VaR</div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>Max Drawdown</h3>
+                        <div class="value">
+                            {% if risk_analysis.Max_Drawdown %}
+                                {{ "%.2f"|format(risk_analysis.Max_Drawdown * 100) }}%
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                        <div class="small">Historical Worst</div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>Sharpe Ratio</h3>
+                        <div class="value">
+                            {% if risk_analysis.Sharpe_Ratio %}
+                                {{ "%.2f"|format(risk_analysis.Sharpe_Ratio) }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                        <div class="small">Risk-Adjusted Return</div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>Sortino Ratio</h3>
+                        <div class="value">
+                            {% if risk_analysis.Sortino_Ratio %}
+                                {{ "%.2f"|format(risk_analysis.Sortino_Ratio) }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </div>
+                        <div class="small">Downside Risk Adjusted</div>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <h4>Risk Metrics Explanation</h4>
+                    <p><strong>VaR (Value at Risk):</strong> The maximum expected loss over a given time period at a specified confidence level. <strong>Expected Shortfall:</strong> The average loss when VaR is exceeded. <strong>Sharpe Ratio:</strong> Risk-adjusted return measure (higher is better). <strong>Sortino Ratio:</strong> Similar to Sharpe but only penalizes downside volatility.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Market Sentiment -->
+        {% if sentiment_analysis %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Market Sentiment Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h3>News Sentiment</h3>
+                        <div class="value">
+                            {% if sentiment_analysis.news_sentiment == 'positive' %}
+                                <span class="change positive">{{ sentiment_analysis.news_sentiment.title() }}</span>
+                            {% elif sentiment_analysis.news_sentiment == 'negative' %}
+                                <span class="change negative">{{ sentiment_analysis.news_sentiment.title() }}</span>
+                            {% else %}
+                                <span class="change neutral">{{ sentiment_analysis.news_sentiment.title() }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="small">Media Coverage</div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>Social Sentiment</h3>
+                        <div class="value">
+                            {% if sentiment_analysis.social_sentiment == 'positive' %}
+                                <span class="change positive">{{ sentiment_analysis.social_sentiment.title() }}</span>
+                            {% elif sentiment_analysis.social_sentiment == 'negative' %}
+                                <span class="change negative">{{ sentiment_analysis.social_sentiment.title() }}</span>
+                            {% else %}
+                                <span class="change neutral">{{ sentiment_analysis.social_sentiment.title() }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="small">Social Media</div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>Analyst Rating</h3>
+                        <div class="value">
+                            {% if sentiment_analysis.analyst_rating == 'buy' %}
+                                <span class="change positive">{{ sentiment_analysis.analyst_rating.title() }}</span>
+                            {% elif sentiment_analysis.analyst_rating == 'sell' %}
+                                <span class="change negative">{{ sentiment_analysis.analyst_rating.title() }}</span>
+                            {% else %}
+                                <span class="change neutral">{{ sentiment_analysis.analyst_rating.title() }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="small">Professional Opinion</div>
+                    </div>
+                    
+                    <div class="summary-card">
+                        <h3>Confidence Score</h3>
+                        <div class="value">{{ "%.0f"|format(sentiment_analysis.confidence_score * 100) }}%</div>
+                        <div class="small">Analysis Reliability</div>
+                    </div>
+                </div>
+                
+                <div class="info-box">
+                    <h4>Sentiment Analysis Insights</h4>
+                    <p>This analysis combines news sentiment, social media sentiment, and analyst recommendations to gauge overall market sentiment toward the stock. Higher confidence scores indicate more reliable sentiment data.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Options Analysis -->
+        {% if plots.options_analysis %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Options Chain Analysis - Combined View</h2>
+            </div>
+            <div class="section-content">
+                <div class="plot-container">
+                    <img src="data:image/png;base64,{{ plots.options_analysis }}" alt="Options Analysis">
+                </div>
+                <div class="info-box">
+                    <h4>Combined Options Analysis</h4>
+                    <p>This comprehensive view shows both call and put options together: volatility smile patterns, pricing dynamics, trading volume, and open interest across different strike prices. This helps identify overall market sentiment and volatility patterns.</p>
+                </div>
+                
+                <!-- Options Summary Statistics -->
+                {% if summary_stats.call_options_count or summary_stats.put_options_count %}
+                <div class="summary-grid" style="margin-top: 20px;">
+                    {% if summary_stats.call_options_count %}
+                    <div class="summary-card">
+                        <h3>Call Options</h3>
+                        <div class="value">{{ summary_stats.call_options_count }}</div>
+                        <div class="small">Available Contracts</div>
+                        {% if summary_stats.call_avg_iv %}
+                        <div class="small">Avg IV: {{ "%.2f"|format(summary_stats.call_avg_iv) }}</div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if summary_stats.put_options_count %}
+                    <div class="summary-card">
+                        <h3>Put Options</h3>
+                        <div class="value">{{ summary_stats.put_options_count }}</div>
+                        <div class="small">Available Contracts</div>
+                        {% if summary_stats.put_avg_iv %}
+                        <div class="small">Avg IV: {{ "%.2f"|format(summary_stats.put_avg_iv) }}</div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if summary_stats.put_call_volume_ratio %}
+                    <div class="summary-card">
+                        <h3>Put/Call Volume Ratio</h3>
+                        <div class="value">{{ "%.2f"|format(summary_stats.put_call_volume_ratio) }}</div>
+                        <div class="small">
+                            {% if summary_stats.put_call_volume_ratio > 1.0 %}
+                                <span class="change negative">Bearish Sentiment</span>
+                            {% elif summary_stats.put_call_volume_ratio < 0.5 %}
+                                <span class="change positive">Bullish Sentiment</span>
+                            {% else %}
+                                <span class="change neutral">Neutral Sentiment</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if summary_stats.put_call_oi_ratio %}
+                    <div class="summary-card">
+                        <h3>Put/Call OI Ratio</h3>
+                        <div class="value">{{ "%.2f"|format(summary_stats.put_call_oi_ratio) }}</div>
+                        <div class="small">
+                            {% if summary_stats.put_call_oi_ratio > 1.0 %}
+                                <span class="change negative">Bearish Outlook</span>
+                            {% elif summary_stats.put_call_oi_ratio < 0.5 %}
+                                <span class="change positive">Bullish Outlook</span>
+                            {% else %}
+                                <span class="change neutral">Balanced Outlook</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Call Options Analysis -->
+        {% if plots.call_options_analysis %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Call Options Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="plot-container">
+                    <img src="data:image/png;base64,{{ plots.call_options_analysis }}" alt="Call Options Analysis">
+                </div>
+                <div class="info-box">
+                    <h4>Call Options Deep Dive</h4>
+                    <p>This analysis focuses specifically on call options, showing volatility skew patterns, pricing dynamics, trading volume, and open interest. Call options typically indicate bullish sentiment when volume and open interest are high.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Put Options Analysis -->
+        {% if plots.put_options_analysis %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Put Options Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="plot-container">
+                    <img src="data:image/png;base64,{{ plots.put_options_analysis }}" alt="Put Options Analysis">
+                </div>
+                <div class="info-box">
+                    <h4>Put Options Deep Dive</h4>
+                    <p>This analysis focuses specifically on put options, showing volatility skew patterns, pricing dynamics, trading volume, and open interest. Put options typically indicate bearish sentiment when volume and open interest are high.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Advanced Comparative Analysis -->
+        {% if plots.advanced_options_analysis %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Advanced Comparative Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="plot-container">
+                    <img src="data:image/png;base64,{{ plots.advanced_options_analysis }}" alt="Advanced Options Analysis">
+                </div>
+                <div class="info-box">
+                    <h4>Comprehensive Options Comparison</h4>
+                    <p>This advanced analysis provides detailed comparisons between calls and puts including put-call ratios, volatility patterns, and moneyness analysis. Put-call ratios above 1.0 typically indicate bearish sentiment, while ratios below 0.5 suggest bullish sentiment.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        {% else %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Options Chain Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="info-box">
+                    <h4>No Options Data Available</h4>
+                    <p>This stock does not have options trading available or the options data could not be retrieved at this time.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Fundamental Ratios -->
+        {% if plots.fundamental_ratios %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Fundamental Financial Ratios</h2>
+            </div>
+            <div class="section-content">
+                <div class="plot-container">
+                    <img src="data:image/png;base64,{{ plots.fundamental_ratios }}" alt="Fundamental Ratios">
+                </div>
+                <div class="info-box">
+                    <h4>Financial Health Indicators</h4>
+                    <p>These ratios provide insights into the company's financial health, including profitability margins, solvency ratios, and return metrics. Compare these to industry averages for better context.</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Fundamental Financial Ratios</h2>
+            </div>
+            <div class="section-content">
+                <div class="info-box">
+                    <h4>No Fundamental Data Available</h4>
+                    <p>Financial statement data could not be retrieved for this stock at this time. This may be due to the stock being an ETF, limited data availability, or API restrictions.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Revenue and Margins Analysis -->
+        {% if plots.revenue_margins %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Revenue and Margin Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="plot-container">
+                    <img src="data:image/png;base64,{{ plots.revenue_margins }}" alt="Revenue and Margins Analysis">
+                </div>
+                <div class="info-box">
+                    <h4>Revenue and Profitability Trends</h4>
+                    <p>This chart shows the company's revenue growth over time (bars) alongside key profitability margins (lines). The dual y-axis allows you to see both absolute revenue figures and percentage margins simultaneously. <strong>Cost of Revenue Margin:</strong> Lower is better (indicates cost efficiency). <strong>Operating Margin:</strong> Shows operational profitability. <strong>NOPAT Margin:</strong> Net Operating Profit After Tax, a key measure of operational efficiency. <strong>Net Income Margin:</strong> Final profitability after all expenses and taxes.</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Revenue and Margin Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="info-box">
+                    <h4>No Revenue and Margin Data Available</h4>
+                    <p>Revenue and margin analysis could not be generated for this stock. This may be due to missing income statement data, insufficient historical data, or the stock being an ETF or other security type that doesn't provide traditional financial statements.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Leverage Ratios Analysis -->
+        {% if plots.leverage_ratios %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Leverage Ratios Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="plot-container">
+                    <img src="data:image/png;base64,{{ plots.leverage_ratios }}" alt="Leverage Ratios Analysis">
+                </div>
+                <div class="info-box">
+                    <h4>Financial Leverage and Debt Management</h4>
+                    <p>This chart analyzes the company's financial leverage and debt management over time. <strong>Debt-to-Equity:</strong> Measures financial leverage (higher values indicate more debt financing). <strong>Debt-to-Assets:</strong> Shows what portion of assets are financed by debt. <strong>Long-term Debt-to-Equity:</strong> Focuses on long-term debt obligations. <strong>Debt-to-Capital:</strong> Measures the proportion of debt in the company's capital structure. <strong>Interest Coverage:</strong> Indicates ability to pay interest expenses (higher is better). Reference lines show common thresholds: Debt-to-Equity = 1.0 and Debt-to-Assets = 0.5.</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Leverage Ratios Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="info-box">
+                    <h4>No Leverage Ratios Data Available</h4>
+                    <p>Leverage ratios analysis could not be generated for this stock. This may be due to missing balance sheet data, insufficient historical data, or the stock being an ETF or other security type that doesn't provide traditional financial statements.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- CAPEX Analysis -->
+        {% if plots.capex_analysis %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Capital Expenditure (CAPEX) Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="plot-container">
+                    <img src="data:image/png;base64,{{ plots.capex_analysis }}" alt="CAPEX Analysis">
+                </div>
+                <div class="info-box">
+                    <h4>Investment in Growth and Infrastructure</h4>
+                    <p>This chart analyzes the company's capital expenditure patterns over time. <strong>Capital Expenditure (Bars):</strong> Shows absolute spending on long-term assets, property, plant, and equipment. <strong>CAPEX Growth Rate (Line):</strong> Indicates year-over-year change in investment levels. Positive growth suggests increasing investment in growth initiatives, while negative growth may indicate cost-cutting or reduced expansion plans. The reference line at 0% shows the threshold between increasing and decreasing investment levels.</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Capital Expenditure (CAPEX) Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="info-box">
+                    <h4>No CAPEX Data Available</h4>
+                    <p>Capital expenditure analysis could not be generated for this stock. This may be due to missing cash flow statement data, insufficient historical data, or the stock being an ETF or other security type that doesn't provide traditional financial statements.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Liquidity Ratios Analysis -->
+        {% if plots.liquidity_ratios %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Liquidity Ratios Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="plot-container">
+                    <img src="data:image/png;base64,{{ plots.liquidity_ratios }}" alt="Liquidity Ratios Analysis">
+                </div>
+                <div class="info-box">
+                    <h4>Short-term Financial Health and Solvency</h4>
+                    <p>This chart analyzes the company's ability to meet short-term obligations and maintain financial flexibility. <strong>Current Ratio:</strong> Measures ability to pay short-term debts with current assets (above 1.0 is generally healthy). <strong>Quick Ratio:</strong> More conservative measure excluding inventory (above 0.5 is typically good). <strong>Cash Ratio:</strong> Most conservative measure using only cash and equivalents (above 0.2 indicates strong liquidity). <strong>Working Capital Ratio:</strong> Shows proportion of assets available for day-to-day operations. Reference lines indicate common industry thresholds for these ratios.</p>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="section">
+            <div class="section-header">
+                <h2>Liquidity Ratios Analysis</h2>
+            </div>
+            <div class="section-content">
+                <div class="info-box">
+                    <h4>No Liquidity Ratios Data Available</h4>
+                    <p>Liquidity ratios analysis could not be generated for this stock. This may be due to missing balance sheet data, insufficient historical data, or the stock being an ETF or other security type that doesn't provide traditional financial statements.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <!-- Data Availability Info -->
+        <div class="section">
+            <div class="section-header">
+                <h2>Data Availability</h2>
+            </div>
+            <div class="section-content">
+                <div class="info-box">
+                    <h4>Market Data</h4>
+                    <p>✅ Price and volume data available for the last year</p>
+                </div>
+                
+                <div class="info-box">
+                    <h4>Options Data</h4>
+                    {% if summary_stats.has_options %}
+                        <p>✅ Options chain data available</p>
+                    {% else %}
+                        <p>❌ No options data available</p>
+                    {% endif %}
+                </div>
+                
+                <div class="info-box">
+                    <h4>Fundamental Data</h4>
+                    {% if summary_stats.has_fundamentals %}
+                        <p>✅ Financial statements and ratios available</p>
+                    {% else %}
+                        <p>❌ No fundamental data available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Dashboard{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <div id="notify-container" role="status" aria-live="polite"></div>
+    {% include 'partials/header.html' %}
+    <main class="container" role="main">
+        {% block content %}{% endblock %}
+    </main>
+    <script>
+    (function() {
+        var container = null;
+        var toastQueue = [];
+        var maxVisible = 3;
+        var activeToasts = [];
+        var lastToastAt = {};
+        var DEBOUNCE_MS = 45000;
+
+        function ensureContainer() {
+            if (!container) {
+                container = document.getElementById('notify-container');
+            }
+            return container;
+        }
+
+        function removeToast(node) {
+            if (!node) return;
+            try {
+                node.classList.add('notify-toast--closing');
+                setTimeout(function() {
+                    if (node && node.parentNode) {
+                        node.parentNode.removeChild(node);
+                    }
+                    var idx = activeToasts.indexOf(node);
+                    if (idx >= 0) activeToasts.splice(idx, 1);
+                    flushQueue();
+                }, 180);
+            } catch (e) {
+                if (node && node.parentNode) node.parentNode.removeChild(node);
+                var idx2 = activeToasts.indexOf(node);
+                if (idx2 >= 0) activeToasts.splice(idx2, 1);
+                flushQueue();
+            }
+        }
+
+        function flushQueue() {
+            while (activeToasts.length < maxVisible && toastQueue.length > 0) {
+                var item = toastQueue.shift();
+                renderToast(item);
+            }
+        }
+
+        function renderToast(opts) {
+            var root = ensureContainer();
+            if (!root) return;
+            var div = document.createElement('div');
+            div.className = 'notify-toast' + (opts.variant ? (' notify-toast--' + opts.variant) : '');
+
+            var content = document.createElement('div');
+            content.className = 'notify-toast__content';
+            var textSpan = document.createElement('span');
+            textSpan.textContent = opts.text || '';
+            content.appendChild(textSpan);
+            if (opts.href) {
+                var link = document.createElement('a');
+                link.className = 'notify-toast__link';
+                link.href = opts.href;
+                link.textContent = ' View';
+                link.addEventListener('click', function() { removeToast(div); });
+                content.appendChild(link);
+            }
+
+            var closeBtn = document.createElement('button');
+            closeBtn.className = 'notify-toast__close';
+            closeBtn.setAttribute('aria-label', 'Dismiss notification');
+            closeBtn.textContent = '×';
+            closeBtn.addEventListener('click', function(ev) {
+                ev.preventDefault();
+                removeToast(div);
+            });
+
+            div.appendChild(content);
+            div.appendChild(closeBtn);
+
+            root.appendChild(div);
+            activeToasts.push(div);
+
+            var ms = typeof opts.duration === 'number' ? opts.duration : 8000;
+            if (ms > 0) {
+                setTimeout(function() { removeToast(div); }, ms);
+            }
+        }
+
+        window.showToast = function(config) {
+            try {
+                var key = (config && config.text) ? String(config.text) : '';
+                var now = Date.now();
+                if (key) {
+                    var last = lastToastAt[key] || 0;
+                    if (now - last < DEBOUNCE_MS) {
+                        return;
+                    }
+                    lastToastAt[key] = now;
+                }
+                toastQueue.push(config || {});
+                flushQueue();
+            } catch (e) { /* no-op */ }
+        };
+
+        function maybeRequestNotifPermissionOnce() {
+            try {
+                if (!('Notification' in window)) return;
+                var asked = localStorage.getItem('notif_perm_asked') === '1';
+                if (asked) return;
+                var handler = function() {
+                    localStorage.setItem('notif_perm_asked', '1');
+                    try { Notification.requestPermission(); } catch (e) {}
+                    document.removeEventListener('click', handler);
+                };
+                document.addEventListener('click', handler, { once: true });
+            } catch (e) {}
+        }
+
+        function notifySystem(title, options) {
+            try {
+                if (!('Notification' in window)) return;
+                if (Notification.permission === 'granted') {
+                    var n = new Notification(title || 'Update', options || {});
+                    if (options && options.data && options.data.href) {
+                        n.onclick = function() { try { window.open(options.data.href, '_blank'); } catch(e){} };
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function parseTs(s) {
+            if (!s) return 0;
+            try { return new Date(s).getTime() || 0; } catch (e) { return 0; }
+        }
+
+        function pollUpdates() {
+            try {
+                fetch('/api/last-updates', { cache: 'no-store' }).then(function(r) {
+                    if (!r.ok) return null;
+                    return r.json();
+                }).then(function(data) {
+                    if (!data) return;
+                    var s_latest = parseTs(data.sectors_latest_at || '');
+                    var m_latest = parseTs(data.macro_latest_at || '');
+
+                    var s_seen = parseTs(localStorage.getItem('sectors_last_seen') || '');
+                    var m_seen = parseTs(localStorage.getItem('macro_last_seen') || '');
+
+                    if (s_latest > s_seen) {
+                        showToast({ text: 'Sectors analysis completed', href: '/sectors', variant: 'success', duration: 10000 });
+                        localStorage.setItem('sectors_last_seen', String(new Date(s_latest).toISOString()))
+                        notifySystem('Sectors analysis completed', { body: 'Click to view results', data: { href: '/sectors' } });
+                    }
+                    if (m_latest > m_seen) {
+                        showToast({ text: 'Macro analysis completed', href: '/macro', variant: 'success', duration: 10000 });
+                        localStorage.setItem('macro_last_seen', String(new Date(m_latest).toISOString()))
+                        notifySystem('Macro analysis completed', { body: 'Click to view results', data: { href: '/macro' } });
+                    }
+                }).catch(function(){});
+            } catch (e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            ensureContainer();
+            maybeRequestNotifPermissionOnce();
+            setInterval(pollUpdates, 20000);
+            setTimeout(pollUpdates, 2000);
+        });
+    })();
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html> 

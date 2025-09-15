@@ -1,0 +1,11 @@
+<header class="site-header" role="banner">
+  <div class="header-inner container">
+    <a href="{{ url_for('home.index') }}" class="brand">Avalon</a>
+    <nav class="nav" role="navigation" aria-label="Primary">
+      <a href="{{ url_for('home.index') }}" class="nav-link{% if active_page == 'home' %} is-active{% endif %}">Home</a>
+      <a href="{{ url_for('yields.yields_view') }}" class="nav-link{% if active_page == 'yields.yields_view' %} is-active{% endif %}">Yields</a>
+      <a href="{{ url_for('sectors.sectors_analysis') }}" class="nav-link{% if active_page == 'sectors' %} is-active{% endif %}">Sectors</a>
+      <a href="{{ url_for('macro.macro_view') }}" class="nav-link{% if active_page == 'macro' %} is-active{% endif %}">Macro</a>
+    </nav>
+  </div>
+</header> 

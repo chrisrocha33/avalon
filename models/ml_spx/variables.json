@@ -1,0 +1,230 @@
+{
+  "config": {
+    "resampling": "M",
+    "top_features": 120,
+    "start_date": "2006-01-01",
+    "end_date": "today",
+    "filters": {
+      "vif_threshold": 5.0
+    },
+    "technical_indicators": {
+      "rolling_returns": [10, 20],
+      "ma_gap": 25,
+      "macd": {"fast": 12, "slow": 26, "signal": 9},
+      "rsi": 15,
+      "stochastic_k": 15,
+      "atr": 15,
+      "bollinger": {"window": 20, "num_std": 2},
+      "skew_kurt_window": 20, 
+      "ac1_window": 60
+    }
+  },
+  "markets": {
+    "north_america": {
+      "equities": {
+        "^DJI": {"lag": 2},
+        "^IXIC": {"lag": 2},
+        "^NYA": {"lag": 2},
+        "^XAX": {"lag": 2},
+        "^RUT": {"lag": 2},
+        "^VIX": {"lag": 2},
+        "^GSPTSE": {"lag": 2},
+        "^MXX": {"lag": 2}
+      },
+      "fx": {
+        "EURCAD=X": {"lag": 2},
+        "MXN=X": {"lag": 2}
+      }
+    },
+    "europe": {
+      "equities": {
+        "^N100": {"lag": 2},
+        "^STOXX50E": {"lag": 2},
+        "^XDE": {"lag": 2},
+        "^FTSE": {"lag": 2},
+        "^BUK100P": {"lag": 2},
+        "^GDAXI": {"lag": 2},
+        "^FCHI": {"lag": 2},
+        "^BFX": {"lag": 2},
+        "MOEX.ME": {"lag": 2}
+      },
+      "fx": {
+        "EURUSD=X": {"lag": 2},
+        "GBPUSD=X": {"lag": 2},
+        "EURCHF=X": {"lag": 2},
+        "EURSEK=X": {"lag": 2},
+        "EURHUF=X": {"lag": 2},
+        "RUB=X": {"lag": 2},
+        "GBPJPY=X": {"lag": 2}
+      }
+    },
+    "south_america": {
+      "equities": {
+        "^BVSP": {"lag": 2},
+        "^MERV": {"lag": 2},
+        "^IPSA": {"lag": 2}
+      }
+    },
+    "asia": {
+      "equities": {
+        "000001.SS": {"lag": 2},
+        "^N225": {"lag": 2},
+        "^HSI": {"lag": 2},
+        "^BSESN": {"lag": 2},
+        "^KS11": {"lag": 2},
+        "^STI": {"lag": 2},
+        "^JKSE": {"lag": 2},
+        "^KLSE": {"lag": 2},
+        "^TWII": {"lag": 2}
+      },
+      "fx": {
+        "JPY=X": {"lag": 2},
+        "CNY=X": {"lag": 2},
+        "HKD=X": {"lag": 2},
+        "SGD=X": {"lag": 2},
+        "INR=X": {"lag": 2},
+        "IDR=X": {"lag": 2},
+        "THB=X": {"lag": 2},
+        "MYR=X": {"lag": 2},
+        "PHP=X": {"lag": 2},
+        "KRW=X": {"lag": 2},
+        "EURJPY=X": {"lag": 2}
+      }
+    },
+    "oceania": {
+      "equities": {
+        "^AXJO": {"lag": 2},
+        "^AORD": {"lag": 2},
+        "^NZ50": {"lag": 2}
+      },
+      "fx": {
+        "AUDUSD=X": {"lag": 2},
+        "NZDUSD=X": {"lag": 2}
+      }
+    },
+    "middle_east": {
+      "equities": {
+        "^TA125.TA": {"lag": 2}
+      },
+      "fx": {}
+    },
+    "africa": {
+      "equities": {
+        "^JN0U.JO": {"lag": 2}
+      },
+      "fx": {
+        "ZAR=X": {"lag": 2}
+      }
+    }
+  },
+  "futures": {
+    "metals": {
+      "GC=F": {"lag": 2},
+      "SI=F": {"lag": 2},
+      "HG=F": {"lag": 2},
+      "PL=F": {"lag": 2},
+      "PA=F": {"lag": 2}
+    },
+    "energy": {
+      "CL=F": {"lag": 2},
+      "NG=F": {"lag": 2},
+      "BZ=F": {"lag": 2},
+      "RB=F": {"lag": 2},
+      "HO=F": {"lag": 2}
+    },
+    "grains": {
+      "ZC=F": {"lag": 2},
+      "ZO=F": {"lag": 2},
+      "KE=F": {"lag": 2},
+      "ZR=F": {"lag": 2},
+      "ZS=F": {"lag": 2},
+      "ZM=F": {"lag": 2},
+      "ZL=F": {"lag": 2}
+    },
+    "softs": {
+      "CC=F": {"lag": 2},
+      "KC=F": {"lag": 2},
+      "CT=F": {"lag": 2},
+      "LBS=F": {"lag": 2},
+      "OJ=F": {"lag": 2},
+      "SB=F": {"lag": 2}
+    },
+    "livestock": {
+      "LE=F": {"lag": 2},
+      "HE=F": {"lag": 2},
+      "GF=F": {"lag": 2}
+    }
+  },
+  "economic_indicators": {
+    "yields": {
+      "DFF": {"lag": 2},
+      "DGS1": {"lag": 2},
+      "DGS2": {"lag": 2},
+      "DGS3": {"lag": 2},
+      "DGS5": {"lag": 2},
+      "DGS7": {"lag": 2},
+      "DGS10": {"lag": 2},
+      "DGS20": {"lag": 2},
+      "DGS30": {"lag": 2},
+      "DTB3": {"lag": 2},
+      "DCPF3M": {"lag": 2},
+      "DTB4WK": {"lag": 2},
+      "RIFSPPFAAD90NB": {"lag": 2},
+      "DCPN3M": {"lag": 2},
+      "SOFRINDEX": {"lag": 2}
+    },
+    "credit_spreads": {
+      "BAMLH0A0HYM2EY": {"lag": 2},
+      "BAMLHYH0A0HYM2TRIV": {"lag": 2},
+      "BAMLC0A0CMEY": {"lag": 2},
+      "BAMLC1A0C13YEY": {"lag": 2},
+      "BAMLC2A0C35YEY": {"lag": 2},
+      "BAMLC3A0C57YEY": {"lag": 2},
+      "BAMLC4A0C710YEY": {"lag": 2},
+      "BAMLC7A0C1015YEY": {"lag": 2},
+      "BAMLC8A0C15PYEY": {"lag": 2}
+    },
+    "prices": {
+      "CPIAPPSL": {"lag": 2},
+      "CPIEDUSL": {"lag": 2},
+      "CPIFABSL": {"lag": 2},
+      "CPIHOSSL": {"lag": 2},
+      "CPIMEDSL": {"lag": 2},
+      "CPIOGSSL": {"lag": 2},
+      "CPIRECSL": {"lag": 2},
+      "CPITRNSL": {"lag": 2},
+      "PCE": {"lag": 2},
+      "PPIACO": {"lag": 2}
+    },
+    "industrial_production": {
+      "IPMANSICS": {"lag": 2},
+      "TLMFGCONS": {"lag": 2}
+    },
+    "labor_market": {
+      "PAYEMS": {"lag": 2},
+      "UNRATE": {"lag": 2},
+      "CES0500000003": {"lag": 2}
+    },
+    "housing_market": {
+      "CSUSHPINSA": {"lag": 2},
+      "HPIPONM226S": {"lag": 2},
+      "TLRESCONS": {"lag": 2}
+    },
+    "trade_indicators": {
+      "IR14270": {"lag": 2},
+      "IQ12260": {"lag": 2},
+      "PETROLEUMD11": {"lag": 2}  
+    },
+    "business_activity": {
+      "FRGSHPUSM649NCIS": {"lag": 2},
+      "TSIFRGHT": {"lag": 2},
+      "TRUCKD11": {"lag": 2}
+    }
+  },
+  "derived_variables": {
+    "yield_spreads": {
+      "yield_spread_2y_10y": {"lag": 2},
+      "yield_spread_3m_2y": {"lag": 2}
+    }
+  }
+}

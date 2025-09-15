@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Econ/Fin Dashboard{% endblock %}
+{% block content %}
+  <div class="actions">
+    <form method="POST" action="{{ url_for('sectors.run_sectors_analysis_endpoint') }}" class="inline-form">
+      <button type="submit" class="button button-primary">Run Sectors</button>
+    </form>
+    <form method="POST" action="{{ url_for('macro.run_macro_analysis_endpoint') }}" class="inline-form">
+      <button type="submit" class="button button-primary">Run Macro</button>
+    </form>
+  </div>
+
+  <div class="card" style="padding: 16px;">
+    <div class="card-title">Quick Stock Report</div>
+    <form action="{{ url_for('quick_report.quick_report_view') }}" method="GET" class="ticker-form">
+      <input type="text" name="ticker" placeholder="Enter ticker (e.g., AAPL)" required>
+      <button type="submit" class="button button-primary">Analyze</button>
+    </form>
+  </div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  function disableBtn(btn, text){
+    if(!btn) return; btn.dataset._orig = btn.textContent; btn.disabled = true; btn.textContent = text || 'Running…';
+  }
+  function enableBtn(btn){ if(!btn) return; btn.disabled = false; if(btn.dataset._orig){ btn.textContent = btn.dataset._orig; }
+  }
+  function postRun(form){
+    var btn = form.querySelector('button[type="submit"]');
+    disableBtn(btn, 'Running…');
+    try { if (window.showToast) showToast({ text: 'Run started', variant: 'success', duration: 3000 }); } catch(e){}
+    fetch(form.action, { method: 'POST' }).then(function(){
+      enableBtn(btn);
+      try { if (window.showToast) showToast({ text: 'Run request sent. You will be notified when done.', variant: 'success', duration: 5000 }); } catch(e){}
+    }).catch(function(){ enableBtn(btn); try { if (window.showToast) showToast({ text: 'Failed to start run', variant: 'error', duration: 6000 }); } catch(e){} });
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var forms = document.querySelectorAll('form.inline-form');
+    var i = 0; while(i < forms.length){
+      (function(f){ f.addEventListener('submit', function(ev){ ev.preventDefault(); postRun(f); }); })(forms[i]);
+      i += 1;
+    }
+  });
+})();
+</script>
+{% endblock %}
