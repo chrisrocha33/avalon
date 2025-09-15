@@ -2,17 +2,44 @@ version: "3.9"
 
 services:
   postgres:
-    image: postgres:16
-    container_name: pg_avalon
+    image: postgres:16-alpine
+    container_name: avalon_postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: avalon
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: "password!"
+      # Single user with superuser privileges
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
     ports:
       - "5432:5432"
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
+      - ./Sector Analysis Tables Creation.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+      - ./quick_queries.sql:/docker-entrypoint-initdb.d/02-queries.sql:ro
+    command: >
+      postgres
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+      -c work_mem=4MB
+      -c min_wal_size=1GB
+      -c max_wal_size=4GB
+      -c max_connections=50
+      -c log_statement=all
+      -c log_min_duration_statement=0
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin -d avalon"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
-  pgdata:
+  postgres_data:
+    driver: local
