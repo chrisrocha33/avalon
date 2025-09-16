@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, jsonify
 
 # Import only from extensions per constraints
 from extensions import db_manager
+from services.data_collection import run_data_collections
 
 home_bp = Blueprint('home', __name__)
 
@@ -64,3 +65,23 @@ def api_last_updates():
         "sectors_latest_at": sectors_ts or "",
         "macro_latest_at": macro_ts or ""
     }) 
+
+
+@home_bp.post('/run-startup-tasks')
+def run_startup_tasks_endpoint():
+    ok = False
+    try:
+        res = run_data_collections()
+        # consider success if all four succeeded
+        ok = all(isinstance(v, dict) and v.get("status") == "success" for k, v in res.items() if k in ("banxico", "financial", "fred", "macro"))
+    except Exception:
+        ok = False
+
+    message = 'Startup data collections completed successfully' if ok else 'Startup data collections failed or partially failed'
+    return render_template(
+        'analysis_complete.html',
+        success=ok,
+        message=message,
+        date=datetime.now().strftime('%Y-%m-%d @ %H:%M'),
+        active_page='home',
+    )
