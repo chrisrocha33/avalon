@@ -20,7 +20,7 @@ class Config:
         # TODO: Replace with the correct DSN for your environment
         "connection_string": os.getenv(
             "DATABASE_URL",
-            "postgresql+psycopg2://admin:password!@localhost:5432/avalon",
+            "postgresql+psycopg://avalon_user:bon.jovi33@127.0.0.1:5432/avalon",
         ),
         "pool_size": int(os.getenv("DB_POOL_SIZE", "20")),
         "max_overflow": int(os.getenv("DB_MAX_OVERFLOW", "30")),
@@ -28,6 +28,9 @@ class Config:
         "pool_pre_ping": True,
         "application_name": os.getenv("DB_APP_NAME", "avalon_dashboard"),
     }
+
+    # FRED API Configuration
+    FRED_API_KEY = os.getenv("FRED_API_KEY", "dc6a021796123eddb26c049a7bccd312")
 
     # Scheduler timings (24h clock)
     # TODO: Adjust schedule to your desired run times

@@ -10,12 +10,12 @@ from datetime import datetime
 import json
 import os
 
-# FRED API Key Configuration
-API_KEY = "b0dfab0fd08d5f0dfe0609230c5f7041"
+# Use centralized config for FRED API key
+from config import Config
 
 # Initialize FRED API
 try:
-    os.environ['FRED_API_KEY'] = API_KEY.strip()
+    os.environ['FRED_API_KEY'] = Config.FRED_API_KEY
     fred = Fred()
     
     # Test API connection
@@ -187,14 +187,11 @@ def resample_data(df, freq):
 
 print(f"="*120)
 print("SQL Connection Starting...")
-server = 'localhost'
-port = '5432'
-database = 'avalon'
-username = 'admin'
-password = 'password!'
+# Use centralized config
+from config import Config
+engine = create_engine(Config.DATABASE['connection_string'], future=True)
 
-conn_str = f'postgresql+psycopg2://{username}:{password}@{server}:{port}/{database}'
-engine = create_engine(conn_str, future=True)   
+print(f"Using database connection from centralized config")   
 
 print(f"="*120)
 print("SQL Connection Successful")
@@ -1142,317 +1139,180 @@ print(f"Total cells: {total_cells:,}")
 print(f"Final NaNs: {final_nans}")
 print(f"Data completeness: {((total_cells - final_nans) / total_cells) * 100:.2f}%")
 
-# ========================================================================
-# DATA COMPRESSION FOR POSTGRESQL ROW SIZE LIMIT
-# ========================================================================
-print(f"="*120)
-print("APPLYING DATA COMPRESSION FOR POSTGRESQL ROW SIZE LIMIT")
 print(f"="*120)
 
-def optimize_dataframe_dtypes(df):
-    """
-    Optimize DataFrame dtypes to minimize memory usage and row size
-    """
-    print("Optimizing data types for compression...")
+# =============================================================================
+# COMPREHENSIVE DATA DIAGNOSTICS - COMPLETE DATAFRAME
+# =============================================================================
+print("="*120)
+print("COMPREHENSIVE DATA DIAGNOSTICS - COMPLETE DATAFRAME")
+print("="*120)
+
+# Basic data shape and structure
+print(f"Number of columns: {len(combined_data.columns)}")
+print(f"Number of rows: {len(combined_data)}")
+print(f"Date range: {combined_data.index.min()} to {combined_data.index.max()}")
+print(f"Total number of data points: {combined_data.size}")
+
+# Data types overview
+print(f"\nData types distribution:")
+dtype_counts = combined_data.dtypes.value_counts()
+for dtype, count in dtype_counts.items():
+    print(f"  {dtype}: {count} columns")
+
+# NaN analysis
+total_nans = combined_data.isna().sum().sum()
+print(f"\nTotal number of NaNs: {total_nans}")
+print(f"Percentage of NaNs: {(total_nans / combined_data.size) * 100:.2f}%")
+
+# Columns with NaNs
+columns_with_nans = combined_data.columns[combined_data.isna().any()].tolist()
+print(f"\nColumns with NaNs ({len(columns_with_nans)} total):")
+for col in columns_with_nans:
+    nan_count = combined_data[col].isna().sum()
+    nan_pct = (nan_count / len(combined_data)) * 100
+    print(f"  {col}: {nan_count} NaNs ({nan_pct:.2f}%)")
+
+# Rows with NaNs
+rows_with_nans = combined_data[combined_data.isna().any(axis=1)]
+print(f"\nRows with NaNs ({len(rows_with_nans)} total):")
+if len(rows_with_nans) > 0:
+    print(f"First 10 rows with NaNs:")
+    for i, (idx, row) in enumerate(rows_with_nans.head(10).iterrows()):
+        nan_cols = row.isna()
+        nan_col_names = nan_cols[nan_cols].index.tolist()
+        print(f"  Row {i+1} ({idx}): {len(nan_col_names)} NaNs in columns: {nan_col_names[:5]}{'...' if len(nan_col_names) > 5 else ''}")
     
-    # Create a copy to avoid modifying original
-    df_optimized = df.copy()
-    
-    # Track compression savings
-    original_memory = df.memory_usage(deep=True).sum()
-    compression_stats = {}
-    
-    for col in df_optimized.columns:
-        col_data = df_optimized[col]
-        original_dtype = col_data.dtype
-        
-        # Skip if already optimized
-        if col_data.dtype.name.startswith(('int8', 'int16', 'float16', 'float32')):
-            continue
-            
-        # For numeric columns, try to downcast
-        if pd.api.types.is_numeric_dtype(col_data):
-            # Check if we can use smaller integer types
-            if col_data.dtype.name.startswith('int'):
-                if col_data.min() >= -128 and col_data.max() <= 127:
-                    df_optimized[col] = col_data.astype('int8')
-                    compression_stats[col] = f"{original_dtype} -> int8"
-                elif col_data.min() >= -32768 and col_data.max() <= 32767:
-                    df_optimized[col] = col_data.astype('int16')
-                    compression_stats[col] = f"{original_dtype} -> int16"
-                elif col_data.min() >= -2147483648 and col_data.max() <= 2147483647:
-                    df_optimized[col] = col_data.astype('int32')
-                    compression_stats[col] = f"{original_dtype} -> int32"
-            
-            # For float columns, try float32 or float16
-            elif col_data.dtype.name.startswith('float'):
-                # Check if we can use float16 (half precision)
-                if not col_data.isna().all():
-                    col_min = col_data.min()
-                    col_max = col_data.max()
-                    # float16 range: approximately -65504 to 65504
-                    if (col_min >= -60000 and col_max <= 60000 and 
-                        not np.isinf(col_data).any()):
-                        try:
-                            df_optimized[col] = col_data.astype('float16')
-                            compression_stats[col] = f"{original_dtype} -> float16"
-                        except (OverflowError, ValueError):
-                            # Fallback to float32
-                            df_optimized[col] = col_data.astype('float32')
-                            compression_stats[col] = f"{original_dtype} -> float32"
-                    else:
-                        # Use float32 for safety
-                        df_optimized[col] = col_data.astype('float32')
-                        compression_stats[col] = f"{original_dtype} -> float32"
-    
-    # Calculate memory savings
-    optimized_memory = df_optimized.memory_usage(deep=True).sum()
-    memory_savings = original_memory - optimized_memory
-    savings_percent = (memory_savings / original_memory) * 100
-    
-    print(f"Memory optimization results:")
-    print(f"  Original memory: {original_memory / 1024 / 1024:.2f} MB")
-    print(f"  Optimized memory: {optimized_memory / 1024 / 1024:.2f} MB")
-    print(f"  Memory saved: {memory_savings / 1024 / 1024:.2f} MB ({savings_percent:.1f}%)")
-    
-    # Show compression stats for first 10 columns
-    if compression_stats:
-        print(f"  Data type optimizations (first 10):")
-        for i, (col, change) in enumerate(list(compression_stats.items())[:10]):
-            print(f"    {col}: {change}")
-        if len(compression_stats) > 10:
-            print(f"    ... and {len(compression_stats) - 10} more")
-    
-    return df_optimized
+    if len(rows_with_nans) > 10:
+        print(f"  ... and {len(rows_with_nans) - 10} more rows with NaNs")
 
-# Apply data type optimization
-combined_data_compressed = optimize_dataframe_dtypes(combined_data)
-
-# Additional compression: Round to reasonable precision
-print("\nApplying precision rounding for additional compression...")
-for col in combined_data_compressed.columns:
-    if pd.api.types.is_numeric_dtype(combined_data_compressed[col]):
-        # Round to 6 decimal places for most columns
-        if 'log_return' in col or 'intraday' in col or 'overnight' in col:
-            # Returns: 6 decimal places
-            combined_data_compressed[col] = combined_data_compressed[col].round(6)
-        elif 'rsi' in col or 'stoch' in col:
-            # RSI/Stochastic: 2 decimal places
-            combined_data_compressed[col] = combined_data_compressed[col].round(2)
-        elif 'macd' in col or 'bb_z' in col:
-            # MACD/Bollinger: 4 decimal places
-            combined_data_compressed[col] = combined_data_compressed[col].round(4)
-        else:
-            # Default: 4 decimal places
-            combined_data_compressed[col] = combined_data_compressed[col].round(4)
-
-# Estimate row size
-print(f"\nEstimating PostgreSQL row size...")
-sample_row = combined_data_compressed.iloc[0]
-estimated_row_size = 0
-
-for col in sample_row.index:
-    value = sample_row[col]
-    if pd.isna(value):
-        estimated_row_size += 4  # NULL value
-    elif isinstance(value, (int, np.integer)):
-        if combined_data_compressed[col].dtype.name == 'int8':
-            estimated_row_size += 1
-        elif combined_data_compressed[col].dtype.name == 'int16':
-            estimated_row_size += 2
-        elif combined_data_compressed[col].dtype.name == 'int32':
-            estimated_row_size += 4
-        else:
-            estimated_row_size += 8
-    elif isinstance(value, (float, np.floating)):
-        if combined_data_compressed[col].dtype.name == 'float16':
-            estimated_row_size += 2
-        elif combined_data_compressed[col].dtype.name == 'float32':
-            estimated_row_size += 4
-        else:
-            estimated_row_size += 8
-    else:
-        estimated_row_size += 8  # Default
-
-# Add overhead for column names and metadata
-column_name_overhead = sum(len(str(col)) for col in combined_data_compressed.columns)
-estimated_row_size += column_name_overhead + 100  # Additional overhead
-
-print(f"  Estimated row size: {estimated_row_size} bytes")
-print(f"  PostgreSQL limit: 8160 bytes")
-print(f"  Safety margin: {8160 - estimated_row_size} bytes")
-
-if estimated_row_size > 8160:
-    print(f"  ⚠️  Row size still exceeds PostgreSQL limit!")
-    print(f"  Additional compression needed...")
-    
-    # More aggressive compression: Use even smaller data types
-    print("  Applying aggressive compression...")
-    
-    for col in combined_data_compressed.columns:
-        if pd.api.types.is_numeric_dtype(combined_data_compressed[col]):
-            col_data = combined_data_compressed[col]
-            
-            # For very small values, try int8
-            if col_data.dtype.name.startswith('float'):
-                if col_data.min() >= -1 and col_data.max() <= 1:
-                    # Scale to int8 range (-128 to 127)
-                    try:
-                        scaled = (col_data * 100).round().astype('int8')
-                        combined_data_compressed[col] = scaled
-                        print(f"    {col}: Scaled to int8")
-                    except (OverflowError, ValueError):
-                        pass
-                elif col_data.min() >= -10 and col_data.max() <= 10:
-                    # Scale to int16 range
-                    try:
-                        scaled = (col_data * 1000).round().astype('int16')
-                        combined_data_compressed[col] = scaled
-                        print(f"    {col}: Scaled to int16")
-                    except (OverflowError, ValueError):
-                        pass
-
-# Re-estimate row size after aggressive compression
-sample_row = combined_data_compressed.iloc[0]
-estimated_row_size = 0
-
-for col in sample_row.index:
-    value = sample_row[col]
-    if pd.isna(value):
-        estimated_row_size += 4
-    elif isinstance(value, (int, np.integer)):
-        if combined_data_compressed[col].dtype.name == 'int8':
-            estimated_row_size += 1
-        elif combined_data_compressed[col].dtype.name == 'int16':
-            estimated_row_size += 2
-        else:
-            estimated_row_size += 4
-    elif isinstance(value, (float, np.floating)):
-        if combined_data_compressed[col].dtype.name == 'float16':
-            estimated_row_size += 2
-        else:
-            estimated_row_size += 4
-    else:
-        estimated_row_size += 4
-
-estimated_row_size += column_name_overhead + 100
-
-print(f"  Final estimated row size: {estimated_row_size} bytes")
-print(f"  PostgreSQL limit: 8160 bytes")
-print(f"  Safety margin: {8160 - estimated_row_size} bytes")
-
-if estimated_row_size <= 8160:
-    print(f"  ✅ Row size within PostgreSQL limits!")
+# Target variable specific analysis
+print(f"\nTarget variable (GSPC_log_return_next_period) analysis:")
+if 'GSPC_log_return_next_period' in combined_data.columns:
+    target_nans = combined_data['GSPC_log_return_next_period'].isna().sum()
+    target_valid = combined_data['GSPC_log_return_next_period'].notna().sum()
+    print(f"  Valid observations: {target_valid}")
+    print(f"  NaN observations: {target_nans}")
+    print(f"  NaN percentage: {(target_nans / len(combined_data)) * 100:.2f}%")
+    if target_valid > 0:
+        print(f"  Mean: {combined_data['GSPC_log_return_next_period'].mean():.6f}")
+        print(f"  Std: {combined_data['GSPC_log_return_next_period'].std():.6f}")
+        print(f"  Min: {combined_data['GSPC_log_return_next_period'].min():.6f}")
+        print(f"  Max: {combined_data['GSPC_log_return_next_period'].max():.6f}")
 else:
-    print(f"  ⚠️  Row size still exceeds limit. Consider chunked insertion...")
+    print("  WARNING: Target variable not found in dataset!")
 
-print(f"="*120)
+# Feature completeness analysis
+print(f"\nFeature completeness analysis:")
+feature_completeness = combined_data.notna().sum(axis=1) / len(combined_data.columns)
+print(f"  Mean completeness: {feature_completeness.mean():.3f}")
+print(f"  Min completeness: {feature_completeness.min():.3f}")
+print(f"  Max completeness: {feature_completeness.max():.3f}")
+print(f"  Rows with 100% completeness: {(feature_completeness == 1.0).sum()}")
+print(f"  Rows with >=80% completeness: {(feature_completeness >= 0.8).sum()}")
+print(f"  Rows with >=50% completeness: {(feature_completeness >= 0.5).sum()}")
 
-# Save to database with compression
-print("Saving compressed data to database...")
-try:
-    # Use the compressed DataFrame
-    combined_data_compressed.to_sql('ml_spx_data', engine, if_exists='replace', index=True, 
-                                   method='multi', chunksize=100)
-    print("✅ Data saved to database: ml_spx_data")
-except Exception as e:
-    print(f"❌ Error saving to database: {e}")
-    print("Trying alternative approach with smaller chunks...")
-    
-    # Try with even smaller chunks
+# Infinite values check
+inf_cols = []
+for col in combined_data.columns:
+    if pd.api.types.is_numeric_dtype(combined_data[col]):
+        if np.isinf(combined_data[col]).any():
+            inf_count = np.isinf(combined_data[col]).sum()
+            inf_cols.append((col, inf_count))
+
+if inf_cols:
+    print(f"\nColumns with infinite values ({len(inf_cols)} total):")
+    for col, count in inf_cols:
+        print(f"  {col}: {count} infinite values")
+else:
+    print(f"\nNo infinite values found in any columns")
+
+# Memory usage
+memory_usage = combined_data.memory_usage(deep=True).sum() / 1024**2  # MB
+print(f"\nMemory usage: {memory_usage:.2f} MB")
+
+# Sample of the data
+print(f"\nFirst 5 rows of complete dataframe:")
+print(combined_data.head())
+
+print(f"\nLast 5 rows of complete dataframe:")
+print(combined_data.tail())
+
+# Column names overview
+print(f"\nColumn names overview (first 20):")
+for i, col in enumerate(combined_data.columns[:20]):
+    print(f"  {i+1:2d}. {col}")
+if len(combined_data.columns) > 20:
+    print(f"  ... and {len(combined_data.columns) - 20} more columns")
+
+print("="*120)
+print("END OF COMPLETE DATAFRAME DIAGNOSTICS")
+print("="*120)
+
+# Save to database with chunking
+print("Saving data to database (chunked parts + manifest)...")
+
+# Separate target column
+_target_colname = 'GSPC_log_return_next_period'
+if _target_colname in combined_data.columns:
     try:
-        combined_data_compressed.to_sql('ml_spx_data', engine, if_exists='replace', index=True, 
-                                       method='multi', chunksize=50)
-        print("✅ Data saved to database with smaller chunks: ml_spx_data")
-    except Exception as e2:
-        print(f"❌ Still failing: {e2}")
-        print("Trying row-by-row insertion...")
-        
-        # Last resort: row-by-row insertion
-        try:
-            combined_data_compressed.to_sql('ml_spx_data', engine, if_exists='replace', index=True, 
-                                           method=None, chunksize=1)
-            print("✅ Data saved to database row-by-row: ml_spx_data")
-        except Exception as e3:
-            print(f"❌ All insertion methods failed: {e3}")
-            print("Trying PostgreSQL TOAST approach...")
-            
-            # Alternative: Use PostgreSQL TOAST by creating table with TEXT columns
-            try:
-                # Create table with TEXT columns to enable TOAST compression
-                create_table_sql = """
-                DROP TABLE IF EXISTS ml_spx_data;
-                CREATE TABLE ml_spx_data (
-                    index TIMESTAMP PRIMARY KEY
-                );
-                """
-                
-                # Add columns as TEXT to enable TOAST
-                for col in combined_data_compressed.columns:
-                    create_table_sql += f'ALTER TABLE ml_spx_data ADD COLUMN "{col}" TEXT;\n'
-                
-                # Execute table creation
-                with engine.connect() as conn:
-                    conn.execute(create_table_sql)
-                    conn.commit()
-                
-                print("✅ Created table with TEXT columns for TOAST compression")
-                
-                # Insert data row by row
-                for idx, row in combined_data_compressed.iterrows():
-                    values = [str(idx)] + [str(val) if not pd.isna(val) else 'NULL' for val in row.values]
-                    placeholders = ', '.join(['%s'] * len(values))
-                    insert_sql = f"INSERT INTO ml_spx_data VALUES ({placeholders})"
-                    
-                    with engine.connect() as conn:
-                        conn.execute(insert_sql, values)
-                        conn.commit()
-                
-                print("✅ Data saved using PostgreSQL TOAST compression: ml_spx_data")
-                
-            except Exception as e4:
-                print(f"❌ TOAST approach also failed: {e4}")
-                print("Final fallback: Split into multiple tables...")
-                
-                # Ultimate fallback: Split data into multiple tables
-                try:
-                    # Split columns into chunks of 400 columns each
-                    chunk_size = 400
-                    total_cols = len(combined_data_compressed.columns)
-                    num_chunks = (total_cols + chunk_size - 1) // chunk_size
-                    
-                    print(f"Splitting {total_cols} columns into {num_chunks} tables...")
-                    
-                    for chunk_idx in range(num_chunks):
-                        start_col = chunk_idx * chunk_size
-                        end_col = min((chunk_idx + 1) * chunk_size, total_cols)
-                        
-                        chunk_cols = combined_data_compressed.columns[start_col:end_col]
-                        chunk_data = combined_data_compressed[chunk_cols].copy()
-                        
-                        table_name = f'ml_spx_data_chunk_{chunk_idx}'
-                        chunk_data.to_sql(table_name, engine, if_exists='replace', index=True)
-                        print(f"  ✅ Saved chunk {chunk_idx + 1}/{num_chunks}: {table_name}")
-                    
-                    print(f"✅ Data split into {num_chunks} tables successfully")
-                    print("Note: You'll need to join these tables when querying the data")
-                    
-                except Exception as e5:
-                    print(f"❌ All approaches failed: {e5}")
-                    raise
+        combined_data[[_target_colname]].to_sql(
+            'ml_spx_target', engine, if_exists='replace', index=True, method='multi', chunksize=1000
+        )
+        print("✅ Target saved to database: ml_spx_target")
+    except Exception as _e_tgt:
+        print(f"❌ Error saving target table: {_e_tgt}")
+else:
+    print(f"⚠️ Target column '{_target_colname}' not found in DataFrame")
+
+# Prepare feature columns (exclude target)
+_feature_cols = []
+for _c in combined_data.columns:
+    if _c != _target_colname:
+        _feature_cols.append(_c)
+
+# Chunk parameters
+_chunk_size = 200
+_base_table = 'ml_spx_data_p'
+_manifest_table = 'ml_spx_data_manifest'
+
+# Write parts
+_num_cols = len(_feature_cols)
+_num_parts = (_num_cols + _chunk_size - 1) // _chunk_size if _num_cols > 0 else 0
+_manifest_rows = []
+
+for _part_idx in range(_num_parts):
+    _start = _part_idx * _chunk_size
+    _end = min(_start + _chunk_size, _num_cols)
+    _part_cols = _feature_cols[_start:_end]
+    _part_df = combined_data[_part_cols].copy()
+    _table_name = f"{_base_table}{str(_part_idx + 1).zfill(3)}"
+    try:
+        _part_df.to_sql(_table_name, engine, if_exists='replace', index=True, method='multi', chunksize=1000)
+        print(f"  ✅ Saved part {_part_idx + 1}/{_num_parts}: {_table_name} with {len(_part_cols)} columns")
+    except Exception as _e_part:
+        print(f"  ❌ Error saving part {_part_idx + 1}: {_e_part}")
+        raise
+    _manifest_rows.append({'table_name': _table_name, 'start_col': _start, 'end_col': _end - 1, 'num_cols': len(_part_cols)})
+
+try:
+    pd.DataFrame(_manifest_rows).to_sql(_manifest_table, engine, if_exists='replace', index=False)
+    print(f"✅ Manifest saved: {_manifest_table} ({len(_manifest_rows)} parts)")
+except Exception as _e_mani:
+    print(f"❌ Error saving manifest: {_e_mani}")
 
 # Also compute and save z-scored version (column-wise standardization)
-print("Computing z-scores for all columns and saving to ml_spx_zscores...")
+print("Computing z-scores for all columns and saving as chunked parts...")
 try:
     # Create a robust z-scores calculation that handles problematic data
     zscores_dict = {}
     problematic_columns = []
     
     print("Processing columns for z-score calculation...")
-    for col in combined_data_compressed.columns:
+    for col in combined_data.columns:
         try:
             # Get the column data
-            col_data = combined_data_compressed[col].copy()
+            col_data = combined_data[col].copy()
             
             # Check for problematic data
             if col_data.isna().all():
@@ -1495,11 +1355,138 @@ try:
                 
         except Exception as col_error:
             print(f"  ❌ Error processing column {col}: {col_error}")
-            zscores_dict[col] = combined_data_compressed[col]  # Keep original data
+            zscores_dict[col] = combined_data[col]  # Keep original data
             problematic_columns.append(f"{col} (error: {str(col_error)[:50]})")
     
     # Create z-scores DataFrame
-    zscores_df = pd.DataFrame(zscores_dict, index=combined_data_compressed.index)
+    zscores_df = pd.DataFrame(zscores_dict, index=combined_data.index)
+    
+    # =============================================================================
+    # COMPREHENSIVE DATA DIAGNOSTICS - Z-SCORES DATAFRAME
+    # =============================================================================
+    print("="*120)
+    print("COMPREHENSIVE DATA DIAGNOSTICS - Z-SCORES DATAFRAME")
+    print("="*120)
+
+    # Basic data shape and structure
+    print(f"Number of columns: {len(zscores_df.columns)}")
+    print(f"Number of rows: {len(zscores_df)}")
+    print(f"Date range: {zscores_df.index.min()} to {zscores_df.index.max()}")
+    print(f"Total number of data points: {zscores_df.size}")
+
+    # Data types overview
+    print(f"\nData types distribution:")
+    dtype_counts = zscores_df.dtypes.value_counts()
+    for dtype, count in dtype_counts.items():
+        print(f"  {dtype}: {count} columns")
+
+    # NaN analysis
+    total_nans = zscores_df.isna().sum().sum()
+    print(f"\nTotal number of NaNs: {total_nans}")
+    print(f"Percentage of NaNs: {(total_nans / zscores_df.size) * 100:.2f}%")
+
+    # Columns with NaNs
+    columns_with_nans = zscores_df.columns[zscores_df.isna().any()].tolist()
+    print(f"\nColumns with NaNs ({len(columns_with_nans)} total):")
+    for col in columns_with_nans:
+        nan_count = zscores_df[col].isna().sum()
+        nan_pct = (nan_count / len(zscores_df)) * 100
+        print(f"  {col}: {nan_count} NaNs ({nan_pct:.2f}%)")
+
+    # Rows with NaNs
+    rows_with_nans = zscores_df[zscores_df.isna().any(axis=1)]
+    print(f"\nRows with NaNs ({len(rows_with_nans)} total):")
+    if len(rows_with_nans) > 0:
+        print(f"First 10 rows with NaNs:")
+        for i, (idx, row) in enumerate(rows_with_nans.head(10).iterrows()):
+            nan_cols = row.isna()
+            nan_col_names = nan_cols[nan_cols].index.tolist()
+            print(f"  Row {i+1} ({idx}): {len(nan_col_names)} NaNs in columns: {nan_col_names[:5]}{'...' if len(nan_col_names) > 5 else ''}")
+        
+        if len(rows_with_nans) > 10:
+            print(f"  ... and {len(rows_with_nans) - 10} more rows with NaNs")
+
+    # Target variable specific analysis (if present in z-scores)
+    print(f"\nTarget variable (GSPC_log_return_next_period) analysis in z-scores:")
+    if 'GSPC_log_return_next_period' in zscores_df.columns:
+        target_nans = zscores_df['GSPC_log_return_next_period'].isna().sum()
+        target_valid = zscores_df['GSPC_log_return_next_period'].notna().sum()
+        print(f"  Valid observations: {target_valid}")
+        print(f"  NaN observations: {target_nans}")
+        print(f"  NaN percentage: {(target_nans / len(zscores_df)) * 100:.2f}%")
+        if target_valid > 0:
+            print(f"  Mean: {zscores_df['GSPC_log_return_next_period'].mean():.6f}")
+            print(f"  Std: {zscores_df['GSPC_log_return_next_period'].std():.6f}")
+            print(f"  Min: {zscores_df['GSPC_log_return_next_period'].min():.6f}")
+            print(f"  Max: {zscores_df['GSPC_log_return_next_period'].max():.6f}")
+    else:
+        print("  Target variable not found in z-scores data")
+
+    # Feature completeness analysis
+    print(f"\nFeature completeness analysis:")
+    feature_completeness = zscores_df.notna().sum(axis=1) / len(zscores_df.columns)
+    print(f"  Mean completeness: {feature_completeness.mean():.3f}")
+    print(f"  Min completeness: {feature_completeness.min():.3f}")
+    print(f"  Max completeness: {feature_completeness.max():.3f}")
+    print(f"  Rows with 100% completeness: {(feature_completeness == 1.0).sum()}")
+    print(f"  Rows with >=80% completeness: {(feature_completeness >= 0.8).sum()}")
+    print(f"  Rows with >=50% completeness: {(feature_completeness >= 0.5).sum()}")
+
+    # Infinite values check
+    inf_cols = []
+    for col in zscores_df.columns:
+        if pd.api.types.is_numeric_dtype(zscores_df[col]):
+            if np.isinf(zscores_df[col]).any():
+                inf_count = np.isinf(zscores_df[col]).sum()
+                inf_cols.append((col, inf_count))
+
+    if inf_cols:
+        print(f"\nColumns with infinite values ({len(inf_cols)} total):")
+        for col, count in inf_cols:
+            print(f"  {col}: {count} infinite values")
+    else:
+        print(f"\nNo infinite values found in any columns")
+
+    # Z-scores specific analysis
+    print(f"\nZ-scores specific analysis:")
+    zscore_stats = []
+    for col in zscores_df.columns:
+        if pd.api.types.is_numeric_dtype(zscores_df[col]) and not zscores_df[col].isna().all():
+            col_data = zscores_df[col].dropna()
+            if len(col_data) > 0:
+                mean_val = col_data.mean()
+                std_val = col_data.std()
+                min_val = col_data.min()
+                max_val = col_data.max()
+                zscore_stats.append((col, mean_val, std_val, min_val, max_val))
+    
+    print(f"  Z-scores statistics (first 10 columns):")
+    for i, (col, mean_val, std_val, min_val, max_val) in enumerate(zscore_stats[:10]):
+        print(f"    {col}: mean={mean_val:.4f}, std={std_val:.4f}, min={min_val:.4f}, max={max_val:.4f}")
+    if len(zscore_stats) > 10:
+        print(f"    ... and {len(zscore_stats) - 10} more columns")
+
+    # Memory usage
+    memory_usage = zscores_df.memory_usage(deep=True).sum() / 1024**2  # MB
+    print(f"\nMemory usage: {memory_usage:.2f} MB")
+
+    # Sample of the data
+    print(f"\nFirst 5 rows of z-scores dataframe:")
+    print(zscores_df.head())
+
+    print(f"\nLast 5 rows of z-scores dataframe:")
+    print(zscores_df.tail())
+
+    # Column names overview
+    print(f"\nColumn names overview (first 20):")
+    for i, col in enumerate(zscores_df.columns[:20]):
+        print(f"  {i+1:2d}. {col}")
+    if len(zscores_df.columns) > 20:
+        print(f"  ... and {len(zscores_df.columns) - 20} more columns")
+
+    print("="*120)
+    print("END OF Z-SCORES DATAFRAME DIAGNOSTICS")
+    print("="*120)
     
     # Report problematic columns
     if problematic_columns:
@@ -1509,12 +1496,38 @@ try:
     else:
         print("✓ All columns processed successfully")
     
-    # Save to database
-    zscores_df.to_sql('ml_spx_zscores', engine, if_exists='replace', index=True)
-    print(f"✓ Z-scores data saved to database: ml_spx_zscores")
-    print(f"  Shape: {zscores_df.shape}")
-    print(f"  Columns processed: {len(zscores_dict)}")
-    print(f"  Problematic columns: {len(problematic_columns)}")
+    # Save z-scores to database in chunked parts + manifest
+    try:
+        _zs_cols = []
+        for _c in zscores_df.columns:
+            if _c != _target_colname:
+                _zs_cols.append(_c)
+
+        _zs_chunk_size = 200
+        _zs_base = 'ml_spx_zscores_p'
+        _zs_manifest = 'ml_spx_zscores_manifest'
+
+        _zs_num_cols = len(_zs_cols)
+        _zs_num_parts = (_zs_num_cols + _zs_chunk_size - 1) // _zs_chunk_size if _zs_num_cols > 0 else 0
+        _zs_manifest_rows = []
+
+        for _p in range(_zs_num_parts):
+            _s = _p * _zs_chunk_size
+            _e = min(_s + _zs_chunk_size, _zs_num_cols)
+            _part_cols = _zs_cols[_s:_e]
+            _part = zscores_df[_part_cols].copy()
+            _tname = f"{_zs_base}{str(_p + 1).zfill(3)}"
+            _part.to_sql(_tname, engine, if_exists='replace', index=True, method='multi', chunksize=1000)
+            print(f"  ✅ Saved z-score part {_p + 1}/{_zs_num_parts}: {_tname} with {len(_part_cols)} columns")
+            _zs_manifest_rows.append({'table_name': _tname, 'start_col': _s, 'end_col': _e - 1, 'num_cols': len(_part_cols)})
+
+        pd.DataFrame(_zs_manifest_rows).to_sql(_zs_manifest, engine, if_exists='replace', index=False)
+        print(f"✅ Z-scores manifest saved: {_zs_manifest} ({len(_zs_manifest_rows)} parts)")
+        print(f"  Z-scores original shape: {zscores_df.shape}")
+        print(f"  Columns processed: {len(zscores_dict)}")
+        print(f"  Problematic columns: {len(problematic_columns)}")
+    except Exception as _e_zs_save:
+        print(f"❌ Error saving z-score parts: {_e_zs_save}")
     
 except Exception as e:
     print(f"❌ Error computing/saving z-scores: {e}")
@@ -1523,10 +1536,10 @@ except Exception as e:
 
 # Display data sample
 print("\nData sample:")
-print(combined_data_compressed.head())
+print(combined_data.head())
 print(f"="*120)
 print("\nGSPC log return next period:")
-print(combined_data_compressed['GSPC_log_return_next_period'].head())
+print(combined_data['GSPC_log_return_next_period'].head())
 print(f"="*120)
 print("\nPipeline completed successfully")
 

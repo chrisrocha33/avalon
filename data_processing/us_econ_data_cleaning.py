@@ -3,6 +3,13 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy import stats
 
+# Apply centralized matplotlib styling
+try:
+    from utils import apply_dashboard_plot_style
+    apply_dashboard_plot_style()
+except ImportError:
+    pass
+
 def run_us_econ_cleaning(db_manager=None):
     print("="*60)
     print("US Econ Data Cleaning - Start")

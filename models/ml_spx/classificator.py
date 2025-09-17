@@ -7,14 +7,16 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 import matplotlib.pyplot as plt
 
-server = 'localhost'
-port = '5432'
-database = 'avalon'
-username = 'admin'
-password = 'password!'
+# Use centralized config
+from config import Config
+engine = create_engine(Config.DATABASE['connection_string'], future=True)
 
-conn_str = f'postgresql+psycopg2://{username}:{password}@{server}:{port}/{database}'
-engine = create_engine(conn_str, future=True)   
+# Apply centralized matplotlib styling
+try:
+    from utils import apply_dashboard_plot_style
+    apply_dashboard_plot_style()
+except ImportError:
+    pass   
 
 
 

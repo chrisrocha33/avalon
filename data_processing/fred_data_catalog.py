@@ -30,7 +30,9 @@ from sqlalchemy import create_engine
 # --------------------------
 # CONFIG
 # --------------------------
-API_KEY = os.getenv("FRED_API_KEY", "dc6a021796123eddb26c049a7bccd312").strip()
+# Use centralized config for FRED API key
+from config import Config
+API_KEY = Config.FRED_API_KEY.strip()
 BASE = "https://api.stlouisfed.org/fred"
 FILE_TYPE = "json"
 
@@ -41,14 +43,9 @@ PAGE_LIMIT = 1000         # FRED max for many endpoints
 SLEEP_JITTER = 0.02       # small jitter to desynchronize threads
 INCREMENTAL_DAYS = None   # e.g. 7 for recent updates only; None for full crawl
 
-# Optional local engine (replace with your own if you prefer to inject)
-server = 'localhost'
-port = '5432'
-database = 'avalon'
-username = 'admin'
-password = 'password!'
-conn_str = f'postgresql+psycopg2://{username}:{password}@{server}:{port}/{database}'
-engine = create_engine(conn_str, future=True)
+# Use centralized config
+from config import Config
+engine = create_engine(Config.DATABASE['connection_string'], future=True)
 
 # --------------------------
 # HTTP SESSION WITH RETRIES

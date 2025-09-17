@@ -4,6 +4,12 @@ import statsmodels.api as sm
 from sqlalchemy import create_engine
 import json
 from statsmodels.stats.outliers_influence import variance_inflation_factor
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression, ElasticNet, ElasticNetCV
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.model_selection import TimeSeriesSplit
 
 try:
     with open('variables.json', 'r') as f:
@@ -13,27 +19,180 @@ except (FileNotFoundError, json.JSONDecodeError) as e:
     print(f"Error loading variables.json: {e}")
     raise
 top_features_count = variables_config.get('config', {}).get('top_features', 50)
-top_diagnostics_count = 80
+drop_bottom_count = variables_config.get('config', {}).get('drop_bottom_features', 0)
+top_diagnostics_count = top_features_count
 
 
 print(f"="*120)
 print("SQL Connection Starting...")
-server = 'localhost'
-port = '5432'
-database = 'avalon'
-username = 'admin'
-password = 'password!'
 
-conn_str = f'postgresql+psycopg2://{username}:{password}@{server}:{port}/{database}'
-engine = create_engine(conn_str, future=True)   
+# Use centralized config
+from config import Config
+engine = create_engine(Config.DATABASE['connection_string'], future=True)
 
 print(f"="*120)
 print("SQL Connection Successful")
 print(f"="*120)
-print("LOADING DATA...")
+print("LOADING Z-SCORES DATA")
 print(f"="*120)
-print("")
-combined_data = pd.read_sql_table('ml_spx_regional_indices', engine,index_col='index')
+
+combined_data = pd.DataFrame()
+_zs_manifest_name = 'ml_spx_data_manifest'
+_zs_parts_loaded = 0
+
+try:
+    _manifest = pd.read_sql_table(_zs_manifest_name, con=engine)
+    if not _manifest.empty and 'table_name' in _manifest.columns:
+        print(f"Found manifest {_zs_manifest_name} with {len(_manifest)} parts")
+        _parts = list(_manifest['table_name'])
+        _assembled = []
+        for _t in _parts:
+            try:
+                _dfp = pd.read_sql_table(_t, con=engine)
+                if 'index' in _dfp.columns:
+                    _dfp['index'] = pd.to_datetime(_dfp['index'])
+                    _dfp = _dfp.set_index('index')
+                _assembled.append(_dfp)
+                _zs_parts_loaded += 1
+                print(f"  ✓ Loaded {_t} with {len(_dfp.columns)} columns")
+            except Exception as _e_p:
+                print(f"  ❌ Failed to load part {_t}: {_e_p}")
+        if len(_assembled) > 0:
+            # Align by index and concatenate columns
+            combined_data = pd.concat(_assembled, axis=1)
+    else:
+        print(f"Manifest {_zs_manifest_name} is empty or missing 'table_name' column; falling back")
+except Exception as _e_m:
+    print(f"Manifest not found or unreadable ({_zs_manifest_name}): {_e_m}. Falling back to single table...")
+
+if combined_data.empty:
+    try:
+        _fallback = pd.read_sql_table("ml_spx_zscores", con=engine)
+        if 'index' in _fallback.columns:
+            _fallback['index'] = pd.to_datetime(_fallback['index'])
+            _fallback = _fallback.set_index('index')
+        combined_data = _fallback
+        print("Loaded fallback table ml_spx_zscores")
+    except Exception as _e_f:
+        print(f"❌ Could not load z-scores (parts or fallback): {_e_f}")
+        raise
+
+print(f"Z-Scores Columns: {len(combined_data.columns)} (from {_zs_parts_loaded} parts if chunked)")
+print(f"Z-Scores Rows: {len(combined_data)}")
+print(f"="*120)
+print("DATA LOADED")
+print(f"="*120)
+
+# Define target variable column name
+gspc_col = "GSPC_log_return_next_period"
+
+# =============================================================================
+# COMPREHENSIVE DATA DIAGNOSTICS FOR Z-SCORES DATA
+# =============================================================================
+print("="*120)
+print("COMPREHENSIVE DATA DIAGNOSTICS - Z-SCORES DATA")
+print("="*120)
+
+# Basic data shape and structure
+print(f"Number of columns: {len(combined_data.columns)}")
+print(f"Number of rows: {len(combined_data)}")
+print(f"Date range: {combined_data.index.min()} to {combined_data.index.max()}")
+print(f"Total number of data points: {combined_data.size}")
+
+# Data types overview
+print(f"\nData types distribution:")
+dtype_counts = combined_data.dtypes.value_counts()
+for dtype, count in dtype_counts.items():
+    print(f"  {dtype}: {count} columns")
+
+# NaN analysis
+total_nans = combined_data.isna().sum().sum()
+print(f"\nTotal number of NaNs: {total_nans}")
+print(f"Percentage of NaNs: {(total_nans / combined_data.size) * 100:.2f}%")
+
+# Columns with NaNs
+columns_with_nans = combined_data.columns[combined_data.isna().any()].tolist()
+print(f"\nColumns with NaNs ({len(columns_with_nans)} total):")
+for col in columns_with_nans:
+    nan_count = combined_data[col].isna().sum()
+    nan_pct = (nan_count / len(combined_data)) * 100
+    print(f"  {col}: {nan_count} NaNs ({nan_pct:.2f}%)")
+
+# Rows with NaNs
+rows_with_nans = combined_data[combined_data.isna().any(axis=1)]
+print(f"\nRows with NaNs ({len(rows_with_nans)} total):")
+if len(rows_with_nans) > 0:
+    print(f"First 10 rows with NaNs:")
+    for i, (idx, row) in enumerate(rows_with_nans.head(10).iterrows()):
+        nan_cols = row.isna()
+        nan_col_names = nan_cols[nan_cols].index.tolist()
+        print(f"  Row {i+1} ({idx}): {len(nan_col_names)} NaNs in columns: {nan_col_names[:5]}{'...' if len(nan_col_names) > 5 else ''}")
+    
+    if len(rows_with_nans) > 10:
+        print(f"  ... and {len(rows_with_nans) - 10} more rows with NaNs")
+
+# Target variable specific analysis (if present)
+if gspc_col in combined_data.columns:
+    print(f"\nTarget variable ({gspc_col}) analysis:")
+    target_nans = combined_data[gspc_col].isna().sum()
+    target_valid = combined_data[gspc_col].notna().sum()
+    print(f"  Valid observations: {target_valid}")
+    print(f"  NaN observations: {target_nans}")
+    print(f"  NaN percentage: {(target_nans / len(combined_data)) * 100:.2f}%")
+    if target_valid > 0:
+        print(f"  Mean: {combined_data[gspc_col].mean():.6f}")
+        print(f"  Std: {combined_data[gspc_col].std():.6f}")
+        print(f"  Min: {combined_data[gspc_col].min():.6f}")
+        print(f"  Max: {combined_data[gspc_col].max():.6f}")
+else:
+    print(f"\nTarget variable ({gspc_col}) not found in z-scores data")
+
+# Feature completeness analysis
+print(f"\nFeature completeness analysis:")
+feature_completeness = combined_data.notna().sum(axis=1) / len(combined_data.columns)
+print(f"  Mean completeness: {feature_completeness.mean():.3f}")
+print(f"  Min completeness: {feature_completeness.min():.3f}")
+print(f"  Max completeness: {feature_completeness.max():.3f}")
+print(f"  Rows with 100% completeness: {(feature_completeness == 1.0).sum()}")
+print(f"  Rows with >=80% completeness: {(feature_completeness >= 0.8).sum()}")
+print(f"  Rows with >=50% completeness: {(feature_completeness >= 0.5).sum()}")
+
+# Infinite values check
+inf_cols = []
+for col in combined_data.columns:
+    if pd.api.types.is_numeric_dtype(combined_data[col]):
+        if np.isinf(combined_data[col]).any():
+            inf_count = np.isinf(combined_data[col]).sum()
+            inf_cols.append((col, inf_count))
+
+if inf_cols:
+    print(f"\nColumns with infinite values ({len(inf_cols)} total):")
+    for col, count in inf_cols:
+        print(f"  {col}: {count} infinite values")
+else:
+    print(f"\nNo infinite values found in any columns")
+
+# Memory usage
+memory_usage = combined_data.memory_usage(deep=True).sum() / 1024**2  # MB
+print(f"\nMemory usage: {memory_usage:.2f} MB")
+
+# Sample of the data
+print(f"\nFirst 5 rows of z-scores data:")
+print(combined_data.head())
+
+print(f"\nLast 5 rows of z-scores data:")
+print(combined_data.tail())
+
+# Column names overview
+print(f"\nColumn names overview (first 20):")
+for i, col in enumerate(combined_data.columns[:20]):
+    print(f"  {i+1:2d}. {col}")
+if len(combined_data.columns) > 20:
+    print(f"  ... and {len(combined_data.columns) - 20} more columns")
+
+print("="*120)
+print("END OF Z-SCORES DATA DIAGNOSTICS")
+print("="*120)
 
 # Decompress: upcast numeric columns to float64 to restore original precision
 try:
@@ -79,9 +238,36 @@ print(f"="*120)
 
 
 
-# Run OLS regression for correlation validation
-gspc_col = "GSPC_log_return_next_period"
+# Try to load target variable from separate table first, then fallback to combined_data
+print(f"="*120)
+print("Loading Target Variable...")
+print(f"="*120)
 
+_target_loaded = False
+
+try:
+    _tgt = pd.read_sql_table('ml_spx_target', con=engine)
+    if 'index' in _tgt.columns:
+        _tgt['index'] = pd.to_datetime(_tgt['index'])
+        _tgt = _tgt.set_index('index')
+    if gspc_col in _tgt.columns:
+        combined_data = combined_data.join(_tgt[[gspc_col]], how='left')
+        _target_loaded = True
+        print(f"Successfully added {gspc_col} from ml_spx_target")
+except Exception as _e_t:
+    print(f"Warning: failed to read ml_spx_target: {_e_t}")
+
+if not _target_loaded:
+    if gspc_col in combined_data.columns:
+        print(f"Using {gspc_col} from combined_data")
+    else:
+        print(f"Warning: {gspc_col} column not found in any source")
+
+print(f"="*120)
+print("Target Variable Loading Complete")
+print(f"="*120)
+
+# Run OLS regression for correlation validation
 if gspc_col not in combined_data.columns:
     print("Error: Target variable not found")
 else:
@@ -197,16 +383,30 @@ else:
             # Sort by p-value (most significant first)
             feature_significance_sorted = sorted(feature_significance, key=lambda x: x[1])
             
-            # Full ranking list and top-N lists for downstream steps
+            # Full ranking list - drop bottom N features instead of taking top N
             ranked_features = [feature for feature, _ in feature_significance_sorted]
-            top_features = ranked_features[:top_features_count]
-            top80_count = min(top_diagnostics_count, len(ranked_features))
-            top80_features = ranked_features[:top80_count]
             
-            print(f"Selected top {top_features_count} features based on p-values:")
-            for i, (feature, pval) in enumerate(feature_significance_sorted[:top_features_count]):
+            if drop_bottom_count > 0:
+                # Drop bottom N features (least significant)
+                features_after_drop = ranked_features[:-drop_bottom_count] if drop_bottom_count < len(ranked_features) else []
+                print(f"Dropped {min(drop_bottom_count, len(ranked_features))} least significant features")
+                print(f"Remaining features: {len(features_after_drop)}")
+            else:
+                # Fallback to top N approach
+                features_after_drop = ranked_features[:top_features_count]
+                print(f"Using top {top_features_count} features")
+            
+            top_features = features_after_drop
+            top80_count = min(top_diagnostics_count, len(features_after_drop))
+            top80_features = features_after_drop[:top80_count]
+            
+            print(f"Selected features based on p-values:")
+            display_count = min(20, len(features_after_drop))
+            for i, (feature, pval) in enumerate(feature_significance_sorted[:display_count]):
                 significance = "***" if pval < 0.001 else "**" if pval < 0.01 else "*" if pval < 0.05 else ""
                 print(f"  {i+1:2d}. {feature:<35} p-val: {pval:.6f} {significance}")
+            if len(features_after_drop) > display_count:
+                print(f"  ... and {len(features_after_drop) - display_count} more features")
             
             # -----------------------------------------------------------------
             # SKIP DEAD-WEIGHT (CORR/MI) → VIF-ONLY PRUNING
@@ -220,7 +420,7 @@ else:
             # TOP-80 DIAGNOSTICS: VIF, CONDITION NUMBER, CORRELATION SUMMARY
             # -----------------------------------------------------------------
             print("-"*120)
-            print("TOP-80 DIAGNOSTICS (VIF / Condition Number / Correlation Summary)")
+            print(f"TOP-{top_diagnostics_count} DIAGNOSTICS (VIF / Condition Number / Correlation Summary)")
             X_top = X_candidates[top80_features].copy()
             # Safety cleaning
             X_top = X_top.replace([np.inf, -np.inf], np.nan)
@@ -254,8 +454,30 @@ else:
             if len(strong_pairs) > 30:
                 print(f"  ... and {len(strong_pairs)-30} more")
 
+            # After printing the correlation block, drop one of each highly correlated pair (not both)
+            # Keep the more significant feature according to the initial ranking (lower index = more significant)
+            feature_rank_index_corr = {f: i for i, f in enumerate(ranked_features)}
+            _corr_drop_set = set()
+            for _a, _b, _r in strong_pairs:
+                if (_a in top80_features) and (_b in top80_features):
+                    _rank_a = feature_rank_index_corr.get(_a, 10**9)
+                    _rank_b = feature_rank_index_corr.get(_b, 10**9)
+                    # Drop the less significant (higher rank index)
+                    if _rank_a <= _rank_b:
+                        _corr_drop_set.add(_b)
+                    else:
+                        _corr_drop_set.add(_a)
+            corr_pruned_features = list(_corr_drop_set)
+            if len(corr_pruned_features) > 0:
+                print("Applying correlation-based pruning (|r| >= 0.95):")
+                print(f"  Dropping {len(corr_pruned_features)} features (keeping the more significant in each pair)")
+                for _f in corr_pruned_features[:20]:
+                    print(f"    drop: {_f}")
+                if len(corr_pruned_features) > 20:
+                    print(f"    ... and {len(corr_pruned_features)-20} more")
+
             # VIF computation
-            print("Computing VIF for top-80 features...")
+            print(f"Computing VIF for top-{top80_count} features...")
             X_top_std_const = sm.add_constant(X_top_std)
             vif_list = []
             for _idx in range(1, X_top_std_const.shape[1]):
@@ -271,60 +493,151 @@ else:
                 print(f"  {_fname:<35} VIF: {_v:>8.2f}")
 
             # -----------------------------------------------------------------
-            # PRUNE REDUNDANCIES from top-80 using correlation and VIF
+            # CORRELATION-CLUSTER REPRESENTATIVE SELECTION + GREEDY FORWARD
             # -----------------------------------------------------------------
             print("-"*120)
-            print("Pruning redundancies from top-80 (VIF threshold only)...")
-            _filters_cfg = variables_config.get('config', {}).get('filters', {}) if isinstance(variables_config.get('config', {}), dict) else {}
-            vif_threshold = float(_filters_cfg.get('vif_threshold', 15.0))
-            print(f"Threshold → VIF <= {vif_threshold:.1f}")
-            feature_rank_index = {f: i for i, f in enumerate(ranked_features)}
-            pruned_features = list(top80_features)
-            drop_reason = {}
+            print("Correlation-cluster representative selection + Greedy forward selection...")
 
-            # VIF-based pruning (iterative)
-            max_iter = max(50, len(pruned_features) * 2)
-            for _iter in range(max_iter):
-                if len(pruned_features) <= 2:
-                    break
-                _X_iter = X_top_std[pruned_features]
-                _X_iter_const = sm.add_constant(_X_iter)
-                _vifs_iter = []
-                for _idx in range(1, _X_iter_const.shape[1]):
-                    _fname = _X_iter_const.columns[_idx]
+            # Parameters
+            cluster_corr_threshold = 0.90
+            greedy_corr_guard = 0.95
+            cond_number_cap = 80.0
+            adjr2_epsilon = 0.001
+            max_features = top_features_count
+
+            # Start from features after earlier correlation pruning if present
+            base_feature_pool = [f for f in top80_features if ('corr_pruned_features' not in locals()) or (f not in corr_pruned_features)]
+            print(f"Feature pool after pairwise corr prune: {len(base_feature_pool)}")
+
+            # Build correlation matrix for pool (standardized for scale invariance)
+            X_pool_std = X_top_std[base_feature_pool].copy()
+            corr_pool = X_pool_std.corr().abs()
+
+            # Cluster by threshold (simple adjacency expansion)
+            visited = set()
+            clusters = []
+            for col in base_feature_pool:
+                if col in visited:
+                    continue
+                cluster = [col]
+                visited.add(col)
+                # collect strongly correlated neighbors
+                for other in base_feature_pool:
+                    if other in visited:
+                        continue
+                    if float(corr_pool.loc[col, other]) >= cluster_corr_threshold:
+                        cluster.append(other)
+                        visited.add(other)
+                clusters.append(cluster)
+
+            print(f"Clusters formed (|r| >= {cluster_corr_threshold:.2f}): {len(clusters)}")
+
+            # Choose representative per cluster using univariate adjusted R^2
+            X_pool_raw = X_candidates[base_feature_pool].copy()
+            reps = []
+            optional_candidates = []
+            for cl in clusters:
+                best_feat = None
+                best_adjr2 = -1e9
+                # rank cluster members by univariate adjusted R^2
+                ranked = []
+                for feat in cl:
                     try:
-                        _v = float(variance_inflation_factor(_X_iter_const.values, _idx))
+                        model_uni = sm.OLS(y_final, sm.add_constant(X_pool_raw[[feat]])).fit()
+                        ranked.append((feat, float(model_uni.rsquared_adj)))
                     except Exception:
-                        _v = float('inf')
-                    _vifs_iter.append((_fname, _v))
-                # First, drop any non-finite VIFs (inf/NaN) – choose least significant by initial rank
-                _non_finite = [(_f, _v) for (_f, _v) in _vifs_iter if not np.isfinite(_v)]
-                if _non_finite:
-                    _non_finite_sorted = sorted(_non_finite, key=lambda x: feature_rank_index.get(x[0], 10**9), reverse=True)
-                    _fname_drop, _vdrop = _non_finite_sorted[0]
-                    if _fname_drop in pruned_features:
-                        pruned_features.remove(_fname_drop)
-                        drop_reason[_fname_drop] = "vif_nonfinite"
+                        ranked.append((feat, -1e9))
+                ranked.sort(key=lambda x: x[1], reverse=True)
+                if len(ranked) > 0:
+                    best_feat, best_adjr2 = ranked[0]
+                    reps.append(best_feat)
+                    # consider a second representative if it adds enough
+                    if len(ranked) > 1:
+                        for feat, _ in ranked[1:3]:  # only consider top 2 extras
+                            optional_candidates.append(feat)
+
+            print(f"Initial representatives selected: {len(reps)}")
+
+            # Optionally add a second rep per cluster if it improves adj R^2 sufficiently
+            selected = list(reps)
+            if len(selected) > 0:
+                try:
+                    base_model = sm.OLS(y_final, sm.add_constant(X_pool_raw[selected])).fit()
+                    current_adjr2 = float(base_model.rsquared_adj)
+                except Exception:
+                    current_adjr2 = -1e9
+            else:
+                current_adjr2 = -1e9
+
+            for feat in optional_candidates:
+                if feat in selected:
+                    continue
+                try:
+                    cand_model = sm.OLS(y_final, sm.add_constant(X_pool_raw[selected + [feat]])).fit()
+                    delta = float(cand_model.rsquared_adj) - current_adjr2
+                    if delta >= adjr2_epsilon:
+                        selected.append(feat)
+                        current_adjr2 = float(cand_model.rsquared_adj)
+                except Exception:
                     continue
 
-                # Otherwise, drop the highest finite VIF above threshold
-                _vifs_iter_sorted = sorted(_vifs_iter, key=lambda x: x[1], reverse=True)
-                _fname_max, _vmax = _vifs_iter_sorted[0]
-                if _vmax <= vif_threshold:
-                    break
-                pruned_features.remove(_fname_max)
-                drop_reason[_fname_max] = f"high_vif({_vmax:.1f})"
-            print(f"Pruned features count: {len(top80_features) - len(pruned_features)}")
-            if drop_reason:
-                _preview = list(drop_reason.items())[:20]
-                print("Examples of drops:")
-                for _f, _why in _preview:
-                    print(f"  {_f:<35} -> {_why}")
-                if len(drop_reason) > 20:
-                    print(f"  ... and {len(drop_reason)-20} more")
+            print(f"After optional reps, selected: {len(selected)}")
 
-            # Choose final selected features from pruned set preserving initial significance order
-            selected_features = [f for f in ranked_features if f in pruned_features][:top_features_count]
+            # Greedy forward selection with guardrails
+            remaining = [f for f in base_feature_pool if f not in selected]
+            improved = True
+            while improved and len(selected) < max_features and len(remaining) > 0:
+                improved = False
+                best_feat = None
+                best_gain = 0.0
+                best_adjr2_next = current_adjr2
+                for feat in remaining:
+                    # Pairwise correlation guard
+                    violate_corr = False
+                    for sf in selected:
+                        try:
+                            if float(corr_pool.loc[feat, sf]) >= greedy_corr_guard:
+                                violate_corr = True
+                                break
+                        except Exception:
+                            continue
+                    if violate_corr:
+                        continue
+
+                    # Condition number guard (on standardized matrix)
+                    try:
+                        X_std_tmp = sm.add_constant(X_pool_std[selected + [feat]])
+                        cond_number = float(np.linalg.cond(X_std_tmp.values))
+                        if cond_number > cond_number_cap:
+                            continue
+                    except Exception:
+                        continue
+
+                    # Evaluate adjusted R^2 gain
+                    try:
+                        model_tmp = sm.OLS(y_final, sm.add_constant(X_pool_raw[selected + [feat]])).fit()
+                        adjr2_next = float(model_tmp.rsquared_adj)
+                        gain = adjr2_next - current_adjr2
+                        if gain > best_gain:
+                            best_gain = gain
+                            best_feat = feat
+                            best_adjr2_next = adjr2_next
+                    except Exception:
+                        continue
+
+                if best_feat is not None and best_gain >= adjr2_epsilon:
+                    selected.append(best_feat)
+                    remaining.remove(best_feat)
+                    current_adjr2 = best_adjr2_next
+                    improved = True
+                    print(f"  Added '{best_feat}'  ΔAdjR²={best_gain:.4f}  total={len(selected)}  AdjR²={current_adjr2:.4f}")
+                else:
+                    break
+
+            print(f"Greedy forward selection complete. Selected features: {len(selected)}  AdjR²={current_adjr2:.4f}")
+
+            # Choose final selected features (limit to top_features_count)
+            selected_features = selected[:top_features_count]
 
             # Update X_final to only include final selected features (post-pruning)
             X_final = X_candidates[selected_features]
@@ -495,3 +808,104 @@ else:
         except Exception as e:
             print(f"Error running OLS regression: {e}")
 
+
+        # =====================================================================
+        # CLASSIFICATION EXPERIMENTS (time-based split; multiple classifiers)
+        # =====================================================================
+        try:
+            print("\n" + "="*80)
+            print("CLASSIFICATION EXPERIMENTS")
+            print("="*80)
+
+            # Prepare binary target: next-period up move (>0 -> 1 else 0)
+            y_bin = (y_final > 0).astype(int)
+
+            # Use X_final if available; else fallback to original cleaned features
+            if 'X_final' in locals() and X_final.shape[1] >= 2:
+                X_cls = X_final.copy()
+            else:
+                # Fallback: use X (pre-pruning) cleaned
+                _X_fallback = X.loc[sufficient_rows].replace([np.inf, -np.inf], np.nan).ffill()
+                X_cls = _X_fallback.copy()
+
+            # Align indexes
+            common_idx = y_bin.index.intersection(X_cls.index)
+            y_bin = y_bin.loc[common_idx]
+            X_cls = X_cls.loc[common_idx]
+
+            # Time-based split (70% train, 30% test)
+            n_obs = len(y_bin)
+            split_idx = int(n_obs * 0.7)
+            train_idx = y_bin.index[:split_idx]
+            test_idx = y_bin.index[split_idx:]
+
+            X_train = X_cls.loc[train_idx]
+            y_train = y_bin.loc[train_idx]
+            X_test = X_cls.loc[test_idx]
+            y_test = y_bin.loc[test_idx]
+
+            # Scale features (fit on train only)
+            scaler = StandardScaler()
+            X_train_scaled = pd.DataFrame(scaler.fit_transform(X_train.values), index=X_train.index, columns=X_train.columns)
+            X_test_scaled = pd.DataFrame(scaler.transform(X_test.values), index=X_test.index, columns=X_test.columns)
+
+            # Define classifiers and whether to use scaled or raw features
+            clf_names = [
+                'LogisticRegression',
+                'SVC_RBF',
+                'RandomForest',
+                'GradientBoosting'
+            ]
+
+            print("\nRunning classifiers:")
+            for name in clf_names:
+                if name == 'LogisticRegression':
+                    clf = LogisticRegression(max_iter=200, n_jobs=None)
+                    X_tr, X_te = X_train_scaled, X_test_scaled
+                elif name == 'SVC_RBF':
+                    clf = SVC(kernel='rbf', probability=True)
+                    X_tr, X_te = X_train_scaled, X_test_scaled
+                elif name == 'RandomForest':
+                    clf = RandomForestClassifier(n_estimators=300, max_depth=None, random_state=42, n_jobs=-1)
+                    X_tr, X_te = X_train, X_test
+                elif name == 'GradientBoosting':
+                    clf = GradientBoostingClassifier(random_state=42)
+                    X_tr, X_te = X_train, X_test
+                else:
+                    continue
+
+                # Fit
+                clf.fit(X_tr, y_train)
+                # Predict proba if available
+                if hasattr(clf, 'predict_proba'):
+                    y_prob = clf.predict_proba(X_te)[:, 1]
+                else:
+                    # Fallback using decision_function if available
+                    if hasattr(clf, 'decision_function'):
+                        df_vals = clf.decision_function(X_te)
+                        # Map decision scores to [0,1] via logistic for auc comparability
+                        y_prob = 1.0 / (1.0 + np.exp(-df_vals))
+                    else:
+                        # No score; approximate with predictions
+                        y_prob = None
+
+                y_pred = clf.predict(X_te)
+
+                # Metrics
+                acc = accuracy_score(y_test, y_pred)
+                prec = precision_score(y_test, y_pred, zero_division=0)
+                rec = recall_score(y_test, y_pred, zero_division=0)
+                f1 = f1_score(y_test, y_pred, zero_division=0)
+                roc = roc_auc_score(y_test, y_prob) if y_prob is not None else float('nan')
+
+                print("-"*70)
+                print(f"Model: {name}")
+                print(f"  Train samples: {len(y_train)}  Test samples: {len(y_test)}  Features: {X_tr.shape[1]}")
+                print(f"  Accuracy: {acc:.4f}")
+                print(f"  Precision: {prec:.4f}")
+                print(f"  Recall: {rec:.4f}")
+                print(f"  F1: {f1:.4f}")
+                print(f"  ROC-AUC: {roc:.4f}")
+
+        except Exception as e:
+            print(f"Error in classification experiments: {e}")

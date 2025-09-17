@@ -1,230 +1,243 @@
 {
   "config": {
     "resampling": "M",
-    "top_features": 120,
-    "start_date": "2006-01-01",
+    "top_features": 50,
+    "drop_bottom_features": 200,
+    "start_date": "2000-01-01",
     "end_date": "today",
     "filters": {
       "vif_threshold": 5.0
     },
+    "dlm": {
+      "discount_factor": 0.98,
+      "ridge_penalty": 0.01,
+      "max_features": 15
+    },
+    
+    "cluster_greedy": {
+      "cluster_corr_threshold": 0.85,
+      "greedy_corr_guard": 0.80,
+      "cond_number_cap": 60.0,
+      "adjr2_epsilon": 0.089
+    },
     "technical_indicators": {
-      "rolling_returns": [10, 20],
-      "ma_gap": 25,
-      "macd": {"fast": 12, "slow": 26, "signal": 9},
-      "rsi": 15,
-      "stochastic_k": 15,
-      "atr": 15,
-      "bollinger": {"window": 20, "num_std": 2},
-      "skew_kurt_window": 20, 
-      "ac1_window": 60
+      "rolling_returns": [3, 8],
+      "ma_gap": 16,
+      "macd": {"fast": 8, "slow": 16, "signal": 8},
+      "rsi": 8,
+      "stochastic_k": 8,
+      "atr": 8,
+      "bollinger": {"window": 8, "num_std": 2},
+      "skew_kurt_window":8, 
+      "ac1_window": 12
     }
   },
   "markets": {
     "north_america": {
       "equities": {
-        "^DJI": {"lag": 2},
-        "^IXIC": {"lag": 2},
-        "^NYA": {"lag": 2},
-        "^XAX": {"lag": 2},
-        "^RUT": {"lag": 2},
-        "^VIX": {"lag": 2},
-        "^GSPTSE": {"lag": 2},
-        "^MXX": {"lag": 2}
+        "^DJI": {"lag": 1},
+        "^IXIC": {"lag": 1},
+        "^NYA": {"lag": 1},
+        "^XAX": {"lag": 1},
+        "^RUT": {"lag": 1},
+        "^VIX": {"lag": 1},
+        "^GSPTSE": {"lag": 1},
+        "^MXX": {"lag": 1}
       },
       "fx": {
-        "EURCAD=X": {"lag": 2},
-        "MXN=X": {"lag": 2}
+        "EURCAD=X": {"lag": 1},
+        "MXN=X": {"lag": 1}
       }
     },
     "europe": {
       "equities": {
-        "^N100": {"lag": 2},
-        "^STOXX50E": {"lag": 2},
-        "^XDE": {"lag": 2},
-        "^FTSE": {"lag": 2},
-        "^BUK100P": {"lag": 2},
-        "^GDAXI": {"lag": 2},
-        "^FCHI": {"lag": 2},
-        "^BFX": {"lag": 2},
-        "MOEX.ME": {"lag": 2}
+        "^N100": {"lag": 1},
+        "^STOXX50E": {"lag": 1},
+        "^XDE": {"lag": 1},
+        "^FTSE": {"lag": 1},
+        "^BUK100P": {"lag": 1},
+        "^GDAXI": {"lag": 1},
+        "^FCHI": {"lag": 1},
+        "^BFX": {"lag": 1},
+        "MOEX.ME": {"lag": 1}
       },
       "fx": {
-        "EURUSD=X": {"lag": 2},
-        "GBPUSD=X": {"lag": 2},
-        "EURCHF=X": {"lag": 2},
-        "EURSEK=X": {"lag": 2},
-        "EURHUF=X": {"lag": 2},
-        "RUB=X": {"lag": 2},
-        "GBPJPY=X": {"lag": 2}
+        "EURUSD=X": {"lag": 1},
+        "GBPUSD=X": {"lag": 1},
+        "EURCHF=X": {"lag": 1},
+        "EURSEK=X": {"lag": 1},
+        "EURHUF=X": {"lag": 1},
+        "RUB=X": {"lag": 1},
+        "GBPJPY=X": {"lag": 1}
       }
     },
     "south_america": {
       "equities": {
-        "^BVSP": {"lag": 2},
-        "^MERV": {"lag": 2},
-        "^IPSA": {"lag": 2}
+        "^BVSP": {"lag": 1},
+        "^MERV": {"lag": 1},
+        "^IPSA": {"lag": 1}
       }
     },
     "asia": {
       "equities": {
-        "000001.SS": {"lag": 2},
-        "^N225": {"lag": 2},
-        "^HSI": {"lag": 2},
-        "^BSESN": {"lag": 2},
-        "^KS11": {"lag": 2},
-        "^STI": {"lag": 2},
-        "^JKSE": {"lag": 2},
-        "^KLSE": {"lag": 2},
-        "^TWII": {"lag": 2}
+        "000001.SS": {"lag": 1},
+        "^N225": {"lag": 1},
+        "^HSI": {"lag": 1},
+        "^BSESN": {"lag": 1},
+        "^KS11": {"lag": 1},
+        "^STI": {"lag": 1},
+        "^JKSE": {"lag": 1},
+        "^KLSE": {"lag": 1},
+        "^TWII": {"lag": 1}
       },
       "fx": {
-        "JPY=X": {"lag": 2},
-        "CNY=X": {"lag": 2},
-        "HKD=X": {"lag": 2},
-        "SGD=X": {"lag": 2},
-        "INR=X": {"lag": 2},
-        "IDR=X": {"lag": 2},
-        "THB=X": {"lag": 2},
-        "MYR=X": {"lag": 2},
-        "PHP=X": {"lag": 2},
-        "KRW=X": {"lag": 2},
-        "EURJPY=X": {"lag": 2}
+        "JPY=X": {"lag": 1},
+        "CNY=X": {"lag": 1},
+        "HKD=X": {"lag": 1},
+        "SGD=X": {"lag": 1},
+        "INR=X": {"lag": 1},
+        "IDR=X": {"lag": 1},
+        "THB=X": {"lag": 1},
+        "MYR=X": {"lag": 1},
+        "PHP=X": {"lag": 1},
+        "KRW=X": {"lag": 1},
+        "EURJPY=X": {"lag": 1}
       }
     },
     "oceania": {
       "equities": {
-        "^AXJO": {"lag": 2},
-        "^AORD": {"lag": 2},
-        "^NZ50": {"lag": 2}
+        "^AXJO": {"lag": 1},
+        "^AORD": {"lag": 1},
+        "^NZ50": {"lag": 1}
       },
       "fx": {
-        "AUDUSD=X": {"lag": 2},
-        "NZDUSD=X": {"lag": 2}
+        "AUDUSD=X": {"lag": 1},
+        "NZDUSD=X": {"lag": 1}
       }
     },
     "middle_east": {
       "equities": {
-        "^TA125.TA": {"lag": 2}
+        "^TA125.TA": {"lag": 1}
       },
       "fx": {}
     },
     "africa": {
       "equities": {
-        "^JN0U.JO": {"lag": 2}
+        "^JN0U.JO": {"lag": 1}
       },
       "fx": {
-        "ZAR=X": {"lag": 2}
+        "ZAR=X": {"lag": 1}
       }
     }
   },
   "futures": {
     "metals": {
-      "GC=F": {"lag": 2},
-      "SI=F": {"lag": 2},
-      "HG=F": {"lag": 2},
-      "PL=F": {"lag": 2},
-      "PA=F": {"lag": 2}
+      "GC=F": {"lag": 1},
+      "SI=F": {"lag": 1},
+      "HG=F": {"lag": 1},
+      "PL=F": {"lag": 1},
+      "PA=F": {"lag": 1}
     },
     "energy": {
-      "CL=F": {"lag": 2},
-      "NG=F": {"lag": 2},
-      "BZ=F": {"lag": 2},
-      "RB=F": {"lag": 2},
-      "HO=F": {"lag": 2}
+      "CL=F": {"lag": 1},
+      "NG=F": {"lag": 1},
+      "BZ=F": {"lag": 1},
+      "RB=F": {"lag": 1},
+      "HO=F": {"lag": 1}
     },
     "grains": {
-      "ZC=F": {"lag": 2},
-      "ZO=F": {"lag": 2},
-      "KE=F": {"lag": 2},
-      "ZR=F": {"lag": 2},
-      "ZS=F": {"lag": 2},
-      "ZM=F": {"lag": 2},
-      "ZL=F": {"lag": 2}
+      "ZC=F": {"lag": 1},
+      "ZO=F": {"lag": 1},
+      "KE=F": {"lag": 1},
+      "ZR=F": {"lag": 1},
+      "ZS=F": {"lag": 1},
+      "ZM=F": {"lag": 1},
+      "ZL=F": {"lag": 1}
     },
     "softs": {
-      "CC=F": {"lag": 2},
-      "KC=F": {"lag": 2},
-      "CT=F": {"lag": 2},
-      "LBS=F": {"lag": 2},
-      "OJ=F": {"lag": 2},
-      "SB=F": {"lag": 2}
+      "CC=F": {"lag": 1},
+      "KC=F": {"lag": 1},
+      "CT=F": {"lag": 1},
+      "LBS=F": {"lag": 1},
+      "OJ=F": {"lag": 1},
+      "SB=F": {"lag": 1}
     },
     "livestock": {
-      "LE=F": {"lag": 2},
-      "HE=F": {"lag": 2},
-      "GF=F": {"lag": 2}
+      "LE=F": {"lag": 1},
+      "HE=F": {"lag": 1},
+      "GF=F": {"lag": 1}
     }
   },
   "economic_indicators": {
     "yields": {
-      "DFF": {"lag": 2},
-      "DGS1": {"lag": 2},
-      "DGS2": {"lag": 2},
-      "DGS3": {"lag": 2},
-      "DGS5": {"lag": 2},
-      "DGS7": {"lag": 2},
-      "DGS10": {"lag": 2},
-      "DGS20": {"lag": 2},
-      "DGS30": {"lag": 2},
-      "DTB3": {"lag": 2},
-      "DCPF3M": {"lag": 2},
-      "DTB4WK": {"lag": 2},
-      "RIFSPPFAAD90NB": {"lag": 2},
-      "DCPN3M": {"lag": 2},
-      "SOFRINDEX": {"lag": 2}
+      "DFF": {"lag": 1},
+      "DGS1": {"lag": 1},
+      "DGS2": {"lag": 1},
+      "DGS3": {"lag": 1},
+      "DGS5": {"lag": 1},
+      "DGS7": {"lag": 1},
+      "DGS10": {"lag": 1},
+      "DGS20": {"lag": 1},
+      "DGS30": {"lag": 1},
+      "DTB3": {"lag": 1},
+      "DCPF3M": {"lag": 1},
+      "DTB4WK": {"lag": 1},
+      "RIFSPPFAAD90NB": {"lag": 1},
+      "DCPN3M": {"lag": 1},
+      "SOFRINDEX": {"lag": 1}
     },
     "credit_spreads": {
-      "BAMLH0A0HYM2EY": {"lag": 2},
-      "BAMLHYH0A0HYM2TRIV": {"lag": 2},
-      "BAMLC0A0CMEY": {"lag": 2},
-      "BAMLC1A0C13YEY": {"lag": 2},
-      "BAMLC2A0C35YEY": {"lag": 2},
-      "BAMLC3A0C57YEY": {"lag": 2},
-      "BAMLC4A0C710YEY": {"lag": 2},
-      "BAMLC7A0C1015YEY": {"lag": 2},
-      "BAMLC8A0C15PYEY": {"lag": 2}
+      "BAMLH0A0HYM2EY": {"lag": 1},
+      "BAMLHYH0A0HYM2TRIV": {"lag": 1},
+      "BAMLC0A0CMEY": {"lag": 1},
+      "BAMLC1A0C13YEY": {"lag": 1},
+      "BAMLC2A0C35YEY": {"lag": 1},
+      "BAMLC3A0C57YEY": {"lag": 1},
+      "BAMLC4A0C710YEY": {"lag": 1},
+      "BAMLC7A0C1015YEY": {"lag": 1},
+      "BAMLC8A0C15PYEY": {"lag": 1}
     },
     "prices": {
-      "CPIAPPSL": {"lag": 2},
-      "CPIEDUSL": {"lag": 2},
-      "CPIFABSL": {"lag": 2},
-      "CPIHOSSL": {"lag": 2},
-      "CPIMEDSL": {"lag": 2},
-      "CPIOGSSL": {"lag": 2},
-      "CPIRECSL": {"lag": 2},
-      "CPITRNSL": {"lag": 2},
-      "PCE": {"lag": 2},
-      "PPIACO": {"lag": 2}
+      "CPIAPPSL": {"lag": 1},
+      "CPIEDUSL": {"lag": 1},
+      "CPIFABSL": {"lag": 1},
+      "CPIHOSSL": {"lag": 1},
+      "CPIMEDSL": {"lag": 1},
+      "CPIOGSSL": {"lag": 1},
+      "CPIRECSL": {"lag": 1},
+      "CPITRNSL": {"lag": 1},
+      "PCE": {"lag": 1},
+      "PPIACO": {"lag": 1}
     },
     "industrial_production": {
-      "IPMANSICS": {"lag": 2},
-      "TLMFGCONS": {"lag": 2}
+      "IPMANSICS": {"lag": 1},
+      "TLMFGCONS": {"lag": 1}
     },
     "labor_market": {
-      "PAYEMS": {"lag": 2},
-      "UNRATE": {"lag": 2},
-      "CES0500000003": {"lag": 2}
+      "PAYEMS": {"lag": 1},
+      "UNRATE": {"lag": 1},
+      "CES0500000003": {"lag": 1}
     },
     "housing_market": {
-      "CSUSHPINSA": {"lag": 2},
-      "HPIPONM226S": {"lag": 2},
-      "TLRESCONS": {"lag": 2}
+      "CSUSHPINSA": {"lag": 1},
+      "HPIPONM226S": {"lag": 1},
+      "TLRESCONS": {"lag": 1}
     },
     "trade_indicators": {
-      "IR14270": {"lag": 2},
-      "IQ12260": {"lag": 2},
-      "PETROLEUMD11": {"lag": 2}  
+      "IR14270": {"lag": 1},
+      "IQ12260": {"lag": 1},
+      "PETROLEUMD11": {"lag": 1}  
     },
     "business_activity": {
-      "FRGSHPUSM649NCIS": {"lag": 2},
-      "TSIFRGHT": {"lag": 2},
-      "TRUCKD11": {"lag": 2}
+      "FRGSHPUSM649NCIS": {"lag": 1},
+      "TSIFRGHT": {"lag": 1},
+      "TRUCKD11": {"lag": 1}
     }
   },
   "derived_variables": {
     "yield_spreads": {
-      "yield_spread_2y_10y": {"lag": 2},
-      "yield_spread_3m_2y": {"lag": 2}
+      "yield_spread_2y_10y": {"lag": 1},
+      "yield_spread_3m_2y": {"lag": 1}
     }
   }
 }

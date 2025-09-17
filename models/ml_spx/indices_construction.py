@@ -8,6 +8,14 @@ from pandas.tseries.offsets import CustomBusinessDay
 from datetime import datetime
 import json
 import os
+import matplotlib.pyplot as plt
+
+# Apply centralized matplotlib styling
+try:
+    from utils import apply_dashboard_plot_style
+    apply_dashboard_plot_style()
+except ImportError:
+    pass
 
 def sanitize_symbol(symbol):
     """Convert raw symbol to column prefix format"""
@@ -18,12 +26,14 @@ def sanitize_symbol(symbol):
 # -----------------------------------------------------------------------------
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
-API_KEY = "b0dfab0fd08d5f0dfe0609230c5f7041 "
+
+# Use centralized config for FRED API key
+from config import Config
 
 # Initialize FRED
 fred = None
 try:
-    os.environ['FRED_API_KEY'] = API_KEY.strip()
+    os.environ['FRED_API_KEY'] = Config.FRED_API_KEY
     fred = Fred()
 except Exception as e:
     print(f"Error initializing FRED API: {e}")
@@ -47,24 +57,58 @@ print(f"="*120)
 print(f"="*120)
 print("SQL Connection Starting...")
 print(f"="*120)
-# SQL connection
-server = 'localhost'
-port = '5432'
-database = 'avalon'
-username = 'admin'
-password = 'password!'
-conn_str = f'postgresql+psycopg2://{username}:{password}@{server}:{port}/{database}'
-engine = create_engine(conn_str, future=True)
+# Use centralized config
+from config import Config
+engine = create_engine(Config.DATABASE['connection_string'], future=True)
 
 print(f"="*120)
 print("SQL Connection Successful")
 print(f"="*120)
 
 print(f"="*120)
-print("Loading Z-Scores Data...")
+print("Loading Z-Scores Data (chunked parts if available)...")
 print(f"="*120)
-#Loading Zscore data
-zscore_df = pd.read_sql_table("ml_spx_zscores", con=engine)
+
+zscore_df = pd.DataFrame()
+_zs_manifest_name = 'ml_spx_zscores_manifest'
+_zs_parts_loaded = 0
+
+try:
+    _manifest = pd.read_sql_table(_zs_manifest_name, con=engine)
+    if not _manifest.empty and 'table_name' in _manifest.columns:
+        print(f"Found manifest {_zs_manifest_name} with {len(_manifest)} parts")
+        _parts = list(_manifest['table_name'])
+        _assembled = []
+        for _t in _parts:
+            try:
+                _dfp = pd.read_sql_table(_t, con=engine)
+                if 'index' in _dfp.columns:
+                    _dfp['index'] = pd.to_datetime(_dfp['index'])
+                    _dfp = _dfp.set_index('index')
+                _assembled.append(_dfp)
+                _zs_parts_loaded += 1
+                print(f"  ✓ Loaded {_t} with {len(_dfp.columns)} columns")
+            except Exception as _e_p:
+                print(f"  ❌ Failed to load part {_t}: {_e_p}")
+        if len(_assembled) > 0:
+            # Align by index and concatenate columns
+            zscore_df = pd.concat(_assembled, axis=1)
+    else:
+        print(f"Manifest {_zs_manifest_name} is empty or missing 'table_name' column; falling back")
+except Exception as _e_m:
+    print(f"Manifest not found or unreadable ({_zs_manifest_name}): {_e_m}. Falling back to single table...")
+
+if zscore_df.empty:
+    try:
+        _fallback = pd.read_sql_table("ml_spx_zscores", con=engine)
+        if 'index' in _fallback.columns:
+            _fallback['index'] = pd.to_datetime(_fallback['index'])
+            _fallback = _fallback.set_index('index')
+        zscore_df = _fallback
+        print("Loaded fallback table ml_spx_zscores")
+    except Exception as _e_f:
+        print(f"❌ Could not load z-scores (parts or fallback): {_e_f}")
+        raise
 
 # Decompress: upcast numeric columns to float64 to restore original precision
 try:
@@ -78,9 +122,117 @@ try:
 except Exception as _e_dec:
     print(f"Decompression warning (indices_construction): {_e_dec}")
 
-print(f"Z-Scores Columns: {len(zscore_df.columns)}")
+print(f"Z-Scores Columns: {len(zscore_df.columns)} (from {_zs_parts_loaded} parts if chunked)")
 print(f"Z-Scores Rows: {len(zscore_df)}")
 print(f"="*120)
+
+# =============================================================================
+# COMPREHENSIVE DATA DIAGNOSTICS FOR Z-SCORES DATA
+# =============================================================================
+print("="*120)
+print("COMPREHENSIVE DATA DIAGNOSTICS - Z-SCORES DATA")
+print("="*120)
+
+# Basic data shape and structure
+print(f"Number of columns: {len(zscore_df.columns)}")
+print(f"Number of rows: {len(zscore_df)}")
+print(f"Date range: {zscore_df.index.min()} to {zscore_df.index.max()}")
+print(f"Total number of data points: {zscore_df.size}")
+
+# Data types overview
+print(f"\nData types distribution:")
+dtype_counts = zscore_df.dtypes.value_counts()
+for dtype, count in dtype_counts.items():
+    print(f"  {dtype}: {count} columns")
+
+# NaN analysis
+total_nans = zscore_df.isna().sum().sum()
+print(f"\nTotal number of NaNs: {total_nans}")
+print(f"Percentage of NaNs: {(total_nans / zscore_df.size) * 100:.2f}%")
+
+# Columns with NaNs
+columns_with_nans = zscore_df.columns[zscore_df.isna().any()].tolist()
+print(f"\nColumns with NaNs ({len(columns_with_nans)} total):")
+for col in columns_with_nans:
+    nan_count = zscore_df[col].isna().sum()
+    nan_pct = (nan_count / len(zscore_df)) * 100
+    print(f"  {col}: {nan_count} NaNs ({nan_pct:.2f}%)")
+
+# Rows with NaNs
+rows_with_nans = zscore_df[zscore_df.isna().any(axis=1)]
+print(f"\nRows with NaNs ({len(rows_with_nans)} total):")
+if len(rows_with_nans) > 0:
+    print(f"First 10 rows with NaNs:")
+    for i, (idx, row) in enumerate(rows_with_nans.head(10).iterrows()):
+        nan_cols = row.isna()
+        nan_col_names = nan_cols[nan_cols].index.tolist()
+        print(f"  Row {i+1} ({idx}): {len(nan_col_names)} NaNs in columns: {nan_col_names[:5]}{'...' if len(nan_col_names) > 5 else ''}")
+    
+    if len(rows_with_nans) > 10:
+        print(f"  ... and {len(rows_with_nans) - 10} more rows with NaNs")
+
+# Target variable specific analysis (if present)
+if 'GSPC_log_return_next_period' in zscore_df.columns:
+    print(f"\nTarget variable (GSPC_log_return_next_period) analysis:")
+    target_nans = zscore_df['GSPC_log_return_next_period'].isna().sum()
+    target_valid = zscore_df['GSPC_log_return_next_period'].notna().sum()
+    print(f"  Valid observations: {target_valid}")
+    print(f"  NaN observations: {target_nans}")
+    print(f"  NaN percentage: {(target_nans / len(zscore_df)) * 100:.2f}%")
+    if target_valid > 0:
+        print(f"  Mean: {zscore_df['GSPC_log_return_next_period'].mean():.6f}")
+        print(f"  Std: {zscore_df['GSPC_log_return_next_period'].std():.6f}")
+        print(f"  Min: {zscore_df['GSPC_log_return_next_period'].min():.6f}")
+        print(f"  Max: {zscore_df['GSPC_log_return_next_period'].max():.6f}")
+else:
+    print(f"\nTarget variable (GSPC_log_return_next_period) not found in z-scores data")
+
+# Feature completeness analysis
+print(f"\nFeature completeness analysis:")
+feature_completeness = zscore_df.notna().sum(axis=1) / len(zscore_df.columns)
+print(f"  Mean completeness: {feature_completeness.mean():.3f}")
+print(f"  Min completeness: {feature_completeness.min():.3f}")
+print(f"  Max completeness: {feature_completeness.max():.3f}")
+print(f"  Rows with 100% completeness: {(feature_completeness == 1.0).sum()}")
+print(f"  Rows with >=80% completeness: {(feature_completeness >= 0.8).sum()}")
+print(f"  Rows with >=50% completeness: {(feature_completeness >= 0.5).sum()}")
+
+# Infinite values check
+inf_cols = []
+for col in zscore_df.columns:
+    if pd.api.types.is_numeric_dtype(zscore_df[col]):
+        if np.isinf(zscore_df[col]).any():
+            inf_count = np.isinf(zscore_df[col]).sum()
+            inf_cols.append((col, inf_count))
+
+if inf_cols:
+    print(f"\nColumns with infinite values ({len(inf_cols)} total):")
+    for col, count in inf_cols:
+        print(f"  {col}: {count} infinite values")
+else:
+    print(f"\nNo infinite values found in any columns")
+
+# Memory usage
+memory_usage = zscore_df.memory_usage(deep=True).sum() / 1024**2  # MB
+print(f"\nMemory usage: {memory_usage:.2f} MB")
+
+# Sample of the data
+print(f"\nFirst 5 rows of z-scores data:")
+print(zscore_df.head())
+
+print(f"\nLast 5 rows of z-scores data:")
+print(zscore_df.tail())
+
+# Column names overview
+print(f"\nColumn names overview (first 20):")
+for i, col in enumerate(zscore_df.columns[:20]):
+    print(f"  {i+1:2d}. {col}")
+if len(zscore_df.columns) > 20:
+    print(f"  ... and {len(zscore_df.columns) - 20} more columns")
+
+print("="*120)
+print("END OF Z-SCORES DATA DIAGNOSTICS")
+print("="*120)
 
 master_dataframe = pd.DataFrame(index=zscore_df.index)
 
@@ -214,12 +366,25 @@ for region in region_to_equities.keys():
 
 # Add target column from zscore_df
 print(f"Adding GSPC_log_return_next_period target column...")
-if 'GSPC_log_return_next_period' in zscore_df.columns:
-    combined_regional_indices['GSPC_log_return_next_period'] = zscore_df['GSPC_log_return_next_period']
-    print(f"Successfully added GSPC_log_return_next_period column")
-else:
-    print(f"Warning: GSPC_log_return_next_period column not found in zscore_df")
-    print(f"Available columns with 'GSPC': {[col for col in zscore_df.columns if 'GSPC' in col]}")
+_target_loaded = False
+try:
+    _tgt = pd.read_sql_table('ml_spx_target', con=engine)
+    if 'index' in _tgt.columns:
+        _tgt['index'] = pd.to_datetime(_tgt['index'])
+        _tgt = _tgt.set_index('index')
+    if 'GSPC_log_return_next_period' in _tgt.columns:
+        combined_regional_indices = combined_regional_indices.join(_tgt[['GSPC_log_return_next_period']], how='left')
+        _target_loaded = True
+        print(f"Successfully added GSPC_log_return_next_period from ml_spx_target")
+except Exception as _e_t:
+    print(f"Warning: failed to read ml_spx_target: {_e_t}")
+
+if not _target_loaded:
+    if 'GSPC_log_return_next_period' in zscore_df.columns:
+        combined_regional_indices['GSPC_log_return_next_period'] = zscore_df['GSPC_log_return_next_period']
+        print(f"Added target from zscore_df fallback")
+    else:
+        print(f"Warning: GSPC_log_return_next_period column not found in sources")
 
 combined_regional_indices.to_sql('ml_spx_regional_indices', engine, if_exists='replace', index=True)
 print(f"Combined Regional Indices DataFrame created with {len(combined_regional_indices.columns)} columns")
@@ -338,6 +503,8 @@ print(f"="*120)
 
 
 master_dataframe = master_dataframe.join(combined_futures_indices)
+master_dataframe['GSPC_log_return_next_period'] = zscore_df['GSPC_log_return_next_period']
+
 
 print(f"="*120)
 print(f"Master Df Columns: {len(master_dataframe.columns)}")
@@ -346,3 +513,8 @@ print(f"Master Df Columns: {master_dataframe.columns.tolist()}")
 print(f"="*120)
 print(f"Master Df Rows: {len(master_dataframe)}")
 
+master_dataframe.to_sql('ivw_indices', engine, if_exists='replace', index=True)
+
+plt.figure(figsize=(10, 5))
+plt.plot(master_dataframe.tail(6))
+plt.show()

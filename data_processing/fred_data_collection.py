@@ -6,6 +6,13 @@ from scipy import stats
 import re
 from sklearn.linear_model import LassoCV
 import seaborn as sns
+
+# Apply centralized matplotlib styling
+try:
+    from utils import apply_dashboard_plot_style
+    apply_dashboard_plot_style()
+except ImportError:
+    pass
 from scipy import stats
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
@@ -25,13 +32,16 @@ import os
 
 # Get the directory where this script is located
 script_dir = os.path.dirname(os.path.abspath(__file__))
-key_file_path = os.path.join(script_dir, 'key.txt')
+
+# Use centralized config for FRED API key
+from config import Config
 
 # Note: This file focuses exclusively on FRED economic data collection
 # Financial market data (stocks, crypto, etc.) is handled separately by financial_data_collection.py
 
-fred = Fred(key_file_path)
-fred.set_api_key_file(key_file_path)
+# Initialize FRED with centralized API key
+os.environ['FRED_API_KEY'] = Config.FRED_API_KEY
+fred = Fred()
 
 
 

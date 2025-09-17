@@ -18,12 +18,17 @@ from flask import render_template
 import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend for Flask
 import matplotlib.pyplot as plt
+
+# Apply centralized matplotlib styling
+try:
+    from utils import apply_dashboard_plot_style
+    apply_dashboard_plot_style()
+except ImportError:
+    pass
 import seaborn as sns
-from utils import apply_dashboard_plot_style
 
 # Suppress warnings
 warnings.filterwarnings("ignore")
-apply_dashboard_plot_style()
 
 def generate_quick_report(ticker, db_manager=None):
     """Generate quick stock analysis report for a given ticker"""
